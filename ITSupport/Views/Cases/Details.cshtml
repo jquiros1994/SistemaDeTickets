@@ -1,0 +1,218 @@
+@model ITSupport.Models.CaseViewModel
+@{
+    Layout = null;
+    ViewBag.Title = Model.CaseNumber;
+    string statusClass = Model.StatusName.Replace(" ", "-");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT Support — @Model.CaseNumber</title>
+    @Styles.Render("~/Content/css")
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f2f5;display:flex;min-height:100vh;color:#333; }
+
+        /* Sidebar */
+        .sidebar{width:240px;min-height:100vh;background:linear-gradient(180deg,#0f3460 0%,#533483 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;}
+        .sidebar-brand{padding:1.5rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.1);}
+        .sidebar-brand .brand-icon{width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;margin-right:.5rem;vertical-align:middle;}
+        .sidebar-brand span{color:#fff;font-size:1rem;font-weight:700;vertical-align:middle;}
+        .sidebar-nav{flex:1;padding:1rem 0;list-style:none;}
+        .nav-section-label{padding:.75rem 1.25rem .35rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.4);}
+        .sidebar-nav a{display:flex;align-items:center;gap:.75rem;padding:.65rem 1.25rem;color:rgba(255,255,255,.75);text-decoration:none;font-size:.88rem;font-weight:500;border-left:3px solid transparent;transition:all .2s;}
+        .sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(255,255,255,.1);color:#fff;border-left-color:#e94560;}
+        .nav-icon{font-size:16px;width:20px;text-align:center;}
+        .sidebar-footer{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.1);}
+        .user-pill{display:flex;align-items:center;gap:.65rem;}
+        .user-avatar{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex-shrink:0;}
+        .user-info{flex:1;overflow:hidden;}
+        .user-name{font-size:.83rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .user-role{font-size:.72rem;color:rgba(255,255,255,.5);}
+        .btn-signout{background:none;border:none;color:rgba(255,255,255,.5);font-size:16px;cursor:pointer;padding:2px;transition:color .2s;text-decoration:none;}
+        .btn-signout:hover{color:#e94560;}
+
+        /* Main */
+        .main-content{margin-left:240px;flex:1;display:flex;flex-direction:column;}
+        .topbar{background:#fff;padding:0 1.75rem;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.08);position:sticky;top:0;z-index:90;}
+        .topbar-left{display:flex;align-items:center;gap:1rem;}
+        .btn-back{background:#f0f2f5;border:none;border-radius:8px;padding:.4rem .85rem;font-size:.82rem;font-weight:600;color:#555;cursor:pointer;text-decoration:none;transition:background .2s;}
+        .btn-back:hover{background:#e4e6ea;color:#333;}
+        .topbar-title h2{font-size:1rem;font-weight:700;color:#1a1a2e;}
+        .topbar-title p{font-size:.78rem;color:#999;margin-top:1px;}
+        .page-body{padding:1.75rem;flex:1;display:grid;grid-template-columns:1fr 300px;gap:1.25rem;align-items:start;}
+
+        /* Cards */
+        .card{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;}
+        .card-header{padding:1rem 1.4rem;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;}
+        .card-header h3{font-size:.95rem;font-weight:700;color:#1a1a2e;}
+        .card-body{padding:1.4rem;}
+
+        .case-title-h{font-size:1.15rem;font-weight:700;color:#1a1a2e;margin-bottom:.75rem;}
+        .case-desc{font-size:.88rem;color:#555;line-height:1.7;white-space:pre-wrap;}
+
+        /* Meta grid */
+        .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+        .meta-item label{display:block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#aaa;margin-bottom:.2rem;}
+        .meta-item span{font-size:.85rem;color:#333;font-weight:500;}
+
+        /* Badges */
+        .badge-priority{display:inline-block;padding:.25rem .65rem;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;}
+        .badge-priority.Critical{background:#fde8ec;color:#c0152a;}
+        .badge-priority.High{background:#fff3e0;color:#e65100;}
+        .badge-priority.Medium{background:#e8f5e9;color:#2e7d32;}
+        .badge-priority.Low{background:#e8f0fe;color:#1565c0;}
+        .badge-status{display:inline-flex;align-items:center;gap:5px;padding:.25rem .65rem;border-radius:20px;font-size:.72rem;font-weight:600;}
+        .badge-status::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+        .badge-status.New{background:#e8f0fe;color:#1565c0;}
+        .badge-status.Assigned{background:#f3e5f5;color:#6a1b9a;}
+        .badge-status.In-Progress{background:#fff8e1;color:#f57f17;}
+        .badge-status.Pending{background:#fce4ec;color:#880e4f;}
+        .badge-status.Escalated{background:#fde8ec;color:#c0152a;}
+        .badge-status.Resolved{background:#e6f9f1;color:#1b5e20;}
+        .badge-status.Closed{background:#f5f5f5;color:#757575;}
+
+        .unassigned{color:#bbb;font-style:italic;font-size:.85rem;}
+        .sla-badge{display:inline-block;background:#e8f0fe;color:#1565c0;border-radius:6px;padding:.2rem .5rem;font-size:.75rem;font-weight:700;}
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">&#128187;</div>
+        <span>IT Support</span>
+    </div>
+    <ul class="sidebar-nav">
+        <li class="nav-section-label">Main Menu</li>
+        <li><a href="@Url.Action("Index","Dashboard")"><span class="nav-icon">&#9636;</span> Dashboard</a></li>
+        <li><a href="@Url.Action("Index","Cases")" class="active"><span class="nav-icon">&#128203;</span> All Cases</a></li>
+        <li><a href="@Url.Action("Create","Cases")"><span class="nav-icon">&#43;</span> New Case</a></li>
+        <li class="nav-section-label" style="margin-top:.5rem">Management</li>
+        <li><a href="#"><span class="nav-icon">&#128100;</span> Customers</a></li>
+        <li><a href="#"><span class="nav-icon">&#128736;</span> Engineers</a></li>
+        <li><a href="#"><span class="nav-icon">&#128202;</span> Reports</a></li>
+        <li class="nav-section-label" style="margin-top:.5rem">Settings</li>
+        <li><a href="#"><span class="nav-icon">&#9881;</span> Configuration</a></li>
+    </ul>
+    <div class="sidebar-footer">
+        <div class="user-pill">
+            <div class="user-avatar">&#128100;</div>
+            <div class="user-info">
+                <div class="user-name">@ViewBag.Username</div>
+                <div class="user-role">@ViewBag.Role</div>
+            </div>
+            <a href="@Url.Action("SignOut","Dashboard")" class="btn-signout" title="Sign out">&#8594;</a>
+        </div>
+    </div>
+</aside>
+
+<!-- Main -->
+<div class="main-content">
+    <header class="topbar">
+        <div class="topbar-left">
+            <a href="@Url.Action("Index","Cases")" class="btn-back">&#8592; Back</a>
+            <div class="topbar-title">
+                <h2>@Model.CaseNumber</h2>
+                <p>Last updated @Model.UpdatedAt.ToString("MMM dd, yyyy HH:mm") UTC</p>
+            </div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+            <span class="badge-priority @Model.PriorityName">@Model.PriorityName</span>
+            <span class="badge-status @statusClass">@Model.StatusName</span>
+        </div>
+    </header>
+
+    <div class="page-body">
+
+        <!-- Left column -->
+        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+
+            <!-- Description -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Case Details</h3>
+                </div>
+                <div class="card-body">
+                    <p class="case-title-h">@Model.Title</p>
+                    <p class="case-desc">@Model.Description</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right column — metadata -->
+        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+            <div class="card">
+                <div class="card-header"><h3>Information</h3></div>
+                <div class="card-body">
+                    <div class="meta-grid">
+
+                        <div class="meta-item">
+                            <label>Status</label>
+                            <span><span class="badge-status @statusClass">@Model.StatusName</span></span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Priority</label>
+                            <span><span class="badge-priority @Model.PriorityName">@Model.PriorityName</span></span>
+                        </div>
+                        <div class="meta-item">
+                            <label>SLA</label>
+                            <span class="sla-badge">@Model.SlaHours h</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Program</label>
+                            <span>@Model.ProgramName</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Contact</label>
+                            <span>@Model.ContactName</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Email</label>
+                            <span style="word-break:break-all;font-size:.8rem">@(Model.ContactEmail ?? "—")</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Owner</label>
+                            <span>
+                                @if (string.IsNullOrEmpty(Model.OwnerName))
+                                { <span class="unassigned">Unassigned</span> }
+                                else
+                                { @Model.OwnerName }
+                            </span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Country</label>
+                            <span>@Model.Country</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Preferred Contact</label>
+                            <span>@(Model.PreferredContact ?? "—")</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Opened</label>
+                            <span>@Model.CreatedAt.ToString("MMM dd, yyyy")</span>
+                        </div>
+                        @if (Model.ClosedAt.HasValue)
+                        {
+                            <div class="meta-item" style="grid-column:span 2">
+                                <label>Closed</label>
+                                <span>@Model.ClosedAt.Value.ToString("MMM dd, yyyy HH:mm") UTC</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>

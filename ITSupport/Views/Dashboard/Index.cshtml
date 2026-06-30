@@ -1,0 +1,571 @@
+@{
+    Layout = null;
+    ViewBag.Title = "Dashboard";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT Support — Dashboard</title>
+    @Styles.Render("~/Content/css")
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0f3460 0%, #533483 100%);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .sidebar-brand span {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            vertical-align: middle;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            list-style: none;
+        }
+
+        .nav-section-label {
+            padding: 0.75rem 1.25rem 0.35rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 1.25rem;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-left-color: #e94560;
+        }
+
+        .sidebar-nav a .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .user-avatar {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .user-info { flex: 1; overflow: hidden; }
+        .user-name  { font-size: 0.83rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-role  { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
+
+        .btn-signout {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px;
+            transition: color 0.2s;
+        }
+        .btn-signout:hover { color: #e94560; }
+
+        /* ── MAIN ── */
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: #fff;
+            padding: 0 1.75rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .topbar-title h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .topbar-title p {
+            font-size: 0.78rem;
+            color: #999;
+            margin-top: 1px;
+        }
+
+        .topbar-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+        .btn-new-case {
+            background: linear-gradient(135deg, #0f3460, #533483);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.45rem 1.1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-new-case:hover { opacity: 0.88; color: #fff; }
+
+        .notif-btn {
+            width: 38px; height: 38px;
+            background: #f5f6fa;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: background 0.2s;
+        }
+        .notif-btn:hover { background: #ebebf0; }
+
+        .notif-badge {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 8px; height: 8px;
+            background: #e94560;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        /* ── PAGE BODY ── */
+        .page-body { padding: 1.75rem; flex: 1; }
+
+        /* ── STAT CARDS ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.1rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.25rem 1.4rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.blue   { background: #e8f0fe; }
+        .stat-icon.red    { background: #fde8ec; }
+        .stat-icon.green  { background: #e6f9f1; }
+        .stat-icon.purple { background: #f0ebff; }
+
+        .stat-value {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: #999;
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            font-size: 0.72rem;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .stat-trend.up   { color: #28a745; }
+        .stat-trend.down { color: #e94560; }
+
+        /* ── CASES TABLE ── */
+        .section-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .section-header h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .section-header a {
+            font-size: 0.8rem;
+            color: #533483;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .section-header a:hover { text-decoration: underline; }
+
+        .cases-table { width: 100%; border-collapse: collapse; }
+
+        .cases-table thead th {
+            padding: 0.7rem 1.4rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #aaa;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .cases-table tbody tr {
+            border-bottom: 1px solid #f8f8f8;
+            transition: background 0.15s;
+        }
+        .cases-table tbody tr:last-child { border-bottom: none; }
+        .cases-table tbody tr:hover { background: #fafbff; }
+
+        .cases-table tbody td {
+            padding: 0.85rem 1.4rem;
+            font-size: 0.85rem;
+            color: #444;
+            vertical-align: middle;
+        }
+
+        .case-number {
+            font-weight: 700;
+            color: #0f3460;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        .case-title {
+            font-weight: 500;
+            color: #222;
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Priority badges */
+        .badge-priority {
+            display: inline-block;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .badge-priority.Critical { background: #fde8ec; color: #c0152a; }
+        .badge-priority.High     { background: #fff3e0; color: #e65100; }
+        .badge-priority.Medium   { background: #e8f5e9; color: #2e7d32; }
+        .badge-priority.Low      { background: #e8f0fe; color: #1565c0; }
+
+        /* Status badges */
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .badge-status::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+        }
+        .badge-status.New         { background: #e8f0fe; color: #1565c0; }
+        .badge-status.Assigned    { background: #f3e5f5; color: #6a1b9a; }
+        .badge-status.In-Progress { background: #fff8e1; color: #f57f17; }
+        .badge-status.Pending     { background: #fce4ec; color: #880e4f; }
+        .badge-status.Escalated   { background: #fde8ec; color: #c0152a; }
+        .badge-status.Resolved    { background: #e6f9f1; color: #1b5e20; }
+
+        .owner-cell { font-size: 0.82rem; color: #666; }
+        .unassigned { color: #bbb; font-style: italic; }
+        .time-cell  { font-size: 0.78rem; color: #bbb; white-space: nowrap; }
+    </style>
+</head>
+<body>
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">&#128187;</div>
+            <span>IT Support</span>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="nav-section-label">Main Menu</li>
+            <li>
+                <a href="#" class="active">
+                    <span class="nav-icon">&#9636;</span> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Index","Cases")">
+                    <span class="nav-icon">&#128203;</span> All Cases
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Create","Cases")">
+                    <span class="nav-icon">&#43;</span> New Case
+                </a>
+            </li>
+
+            <li class="nav-section-label" style="margin-top:0.5rem;">Management</li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">&#128100;</span> Customers
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">&#128736;</span> Engineers
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">&#128202;</span> Reports
+                </a>
+            </li>
+
+            <li class="nav-section-label" style="margin-top:0.5rem;">Settings</li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">&#9881;</span> Configuration
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="user-avatar">&#128100;</div>
+                <div class="user-info">
+                    <div class="user-name">@ViewBag.Username</div>
+                    <div class="user-role">@ViewBag.Role</div>
+                </div>
+                <a href="@Url.Action("SignOut", "Dashboard")" class="btn-signout" title="Sign out">&#8594;</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <div class="main-content">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h2>Dashboard</h2>
+                <p>Welcome back — here's what's happening today</p>
+            </div>
+            <div class="topbar-actions">
+                <button class="notif-btn" title="Notifications">
+                    &#128276;
+                    <span class="notif-badge"></span>
+                </button>
+                <a href="@Url.Action("Create","Cases")" class="btn-new-case">&#43; New Case</a>
+            </div>
+        </header>
+
+        <!-- Page Body -->
+        <div class="page-body">
+
+            <!-- Stat Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">&#128203;</div>
+                    <div>
+                        <div class="stat-value">@ViewBag.OpenCases</div>
+                        <div class="stat-label">Open Cases</div>
+                        <div class="stat-trend up">&#8593; 4 since yesterday</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">&#9888;</div>
+                    <div>
+                        <div class="stat-value">@ViewBag.CriticalCases</div>
+                        <div class="stat-label">Critical Priority</div>
+                        <div class="stat-trend down">&#8593; 1 since yesterday</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">&#10003;</div>
+                    <div>
+                        <div class="stat-value">@ViewBag.ResolvedToday</div>
+                        <div class="stat-label">Resolved Today</div>
+                        <div class="stat-trend up">&#8593; 3 vs yesterday</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">&#128100;</div>
+                    <div>
+                        <div class="stat-value">@ViewBag.ActiveEngineers</div>
+                        <div class="stat-label">Active Engineers</div>
+                        <div class="stat-trend up">All online</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Cases Table -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Recent Cases</h3>
+                    <a href="@Url.Action("Index","Cases")">View all cases &rarr;</a>
+                </div>
+                <table class="cases-table">
+                    <thead>
+                        <tr>
+                            <th>Case #</th>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Customer</th>
+                            <th>Owner</th>
+                            <th>Opened</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (ITSupport.Models.CaseViewModel c in ViewBag.RecentCases)
+                        {
+                            string statusClass = c.StatusName.Replace(" ", "-");
+                            string timeAgo;
+                            var diff = DateTime.UtcNow - c.CreatedAt;
+                            if (diff.TotalMinutes < 60)
+                            { timeAgo = (int)diff.TotalMinutes + "m ago"; }
+                            else if (diff.TotalHours < 24)
+                            { timeAgo = (int)diff.TotalHours + "h ago"; }
+                            else
+                            { timeAgo = (int)diff.TotalDays + "d ago"; }
+
+                            <tr>
+                                <td><span class="case-number">@c.CaseNumber</span></td>
+                                <td><span class="case-title" title="@c.Title">@c.Title</span></td>
+                                <td><span class="badge-priority @c.PriorityName">@c.PriorityName</span></td>
+                                <td><span class="badge-status @statusClass">@c.StatusName</span></td>
+                                <td>@c.CustomerName</td>
+                                <td>
+                                    @if (string.IsNullOrEmpty(c.OwnerName))
+                                    {
+                                        <span class="unassigned">Unassigned</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="owner-cell">@c.OwnerName</span>
+                                    }
+                                </td>
+                                <td><span class="time-cell">@timeAgo</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>

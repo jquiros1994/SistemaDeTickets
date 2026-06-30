@@ -1,0 +1,270 @@
+@{
+    Layout = null;
+    ViewBag.Title = "Login";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT Support — Login</title>
+    @Styles.Render("~/Content/css")
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #0f3460, #533483);
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+            color: #fff;
+        }
+
+        .login-header .brand-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 28px;
+        }
+
+        .login-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem;
+            letter-spacing: 0.5px;
+        }
+
+        .login-header p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .login-body {
+            padding: 2rem;
+        }
+
+        .form-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        .input-group-icon {
+            position: relative;
+        }
+
+        .input-group-icon .field-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 15px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .input-group-icon .form-control {
+            padding-left: 38px;
+            border-radius: 8px;
+            border: 1.5px solid #e0e0e0;
+            height: 44px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-group-icon .form-control:focus {
+            border-color: #0f3460;
+            box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.12);
+        }
+
+        .form-check-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .btn-login {
+            width: 100%;
+            height: 46px;
+            background: linear-gradient(135deg, #0f3460, #533483);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn-login:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #bbb;
+            font-size: 0.8rem;
+            margin: 1.25rem 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e8e8e8;
+        }
+
+        .forgot-link {
+            display: block;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #0f3460;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-link:hover {
+            color: #533483;
+            text-decoration: underline;
+        }
+
+        .login-footer {
+            padding: 1rem 2rem 1.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #aaa;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .login-footer span {
+            color: #0f3460;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+
+            <!-- Header -->
+            <div class="login-header">
+                <div class="brand-icon">
+                    &#128187;
+                </div>
+                <h1>IT Support Portal</h1>
+                <p>Sign in to manage your support cases</p>
+            </div>
+
+            <!-- Form -->
+            <div class="login-body">
+                @if (TempData["Error"] != null)
+                {
+                    <div style="background:#fde8ec;color:#c0152a;border-radius:8px;padding:0.65rem 1rem;font-size:0.85rem;font-weight:600;margin-bottom:1rem;">
+                        &#9888; @TempData["Error"]
+                    </div>
+                }
+                @using (Html.BeginForm("Index", "Dashboard", FormMethod.Post))
+                {
+                    <div class="mb-3">
+                        <label class="form-label" for="email">Email address</label>
+                        <div class="input-group-icon">
+                            <span class="field-icon">&#9993;</span>
+                            <input type="email"
+                                   id="email"
+                                   name="email"
+                                   class="form-control"
+                                   placeholder="you@company.com"
+                                   required
+                                   autocomplete="username" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-group-icon">
+                            <span class="field-icon">&#128274;</span>
+                            <input type="password"
+                                   id="password"
+                                   name="password"
+                                   class="form-control"
+                                   placeholder="••••••••"
+                                   required
+                                   autocomplete="current-password" />
+                        </div>
+                    </div>
+
+                    <div class="mb-4 d-flex align-items-center justify-content-between">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe" />
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-link" style="display:inline;">Forgot password?</a>
+                    </div>
+
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-login">Sign In</button>
+
+                    <div class="divider">or</div>
+
+                    <a href="#" class="forgot-link">Don't have an account? Contact support</a>
+
+                }
+            </div>
+
+            <!-- Footer -->
+            <div class="login-footer">
+                &copy; @DateTime.Now.Year <span>IT Support</span> &mdash; All rights reserved
+            </div>
+
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>

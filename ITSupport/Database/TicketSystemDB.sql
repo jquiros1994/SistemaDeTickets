@@ -4,11 +4,6 @@
 --  Orden de creacion respeta todas las FK
 -- ============================================================
 
-USE master;
-GO
-
-
-
 CREATE DATABASE TicketSystemDB
 
 
@@ -227,6 +222,24 @@ CREATE TABLE Users (
         FOREIGN KEY (EngineerId)  REFERENCES SupportEngineers(EngineerId)
 );
 GO
+
+
+USE TicketSystemDB;
+GO
+
+INSERT INTO Users (Username, Email, PasswordHash, RoleId, CustomerId, EngineerId, IsActive)
+VALUES (
+    'Super.Admin',
+    'Super.admin@support.com',
+    'admin',  -- hash de "admin"
+    1,        -- RoleId 1 = Admin
+    NULL,
+    NULL,
+    1
+);
+GO
+
+SELECT * FROM USERS ;
 
 -- ============================================================
 --  11. CASES
