@@ -1,17 +1,12 @@
 using System.Web.Mvc;
-using ITSupport.DAL;
+using ITSupport.Business;
 using ITSupport.Models;
 
 namespace ITSupport.Controllers
 {
     public class CasesController : Controller
     {
-        private readonly CaseRepository         _cases    = new CaseRepository();
-        private readonly CaseStatusRepository   _statuses = new CaseStatusRepository();
-        private readonly PriorityRepository     _priorities = new PriorityRepository();
-        private readonly ContactRepository      _contacts = new ContactRepository();
-        private readonly SupportEngineerRepository _engineers = new SupportEngineerRepository();
-        private readonly ProgramRepository      _programs = new ProgramRepository();
+        private readonly CaseBusiness _cases = new CaseBusiness();
 
         private bool IsAuthenticated() => Session["UserId"] != null;
 
@@ -22,7 +17,7 @@ namespace ITSupport.Controllers
 
             ViewBag.Username   = Session["Username"];
             ViewBag.Role       = Session["Role"];
-            ViewBag.Statuses   = _statuses.GetAll();
+            ViewBag.Statuses = _cases.GetStatuses();
             ViewBag.StatusId   = statusId;
             ViewBag.Search     = search;
 
@@ -50,11 +45,11 @@ namespace ITSupport.Controllers
 
             ViewBag.Username   = Session["Username"];
             ViewBag.Role       = Session["Role"];
-            ViewBag.Statuses   = _statuses.GetAll();
-            ViewBag.Priorities = _priorities.GetAll();
-            ViewBag.Contacts   = _contacts.GetAll();
-            ViewBag.Engineers  = _engineers.GetAll();
-            ViewBag.Programs   = _programs.GetAll();
+            ViewBag.Statuses = _cases.GetStatuses();
+            ViewBag.Priorities = _cases.GetPriorities();
+            ViewBag.Contacts = _cases.GetContacts();
+            ViewBag.Engineers = _cases.GetEngineers();
+            ViewBag.Programs = _cases.GetPrograms(); ;
 
             return View();
         }
@@ -69,7 +64,7 @@ namespace ITSupport.Controllers
             model.CreatedByUserId = (int)Session["UserId"];
             model.StatusId = model.StatusId == 0 ? 1 : model.StatusId; // default: New
 
-            int newId = _cases.Insert(model);
+            int newId = _cases.Create(model);
             return RedirectToAction("Details", new { id = newId });
         }
     }

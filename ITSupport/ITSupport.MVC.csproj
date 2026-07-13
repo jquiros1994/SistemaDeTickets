@@ -123,40 +123,6 @@
     <Compile Include="Controllers\CasesController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="DAL\AttachmentRepository.cs" />
-    <Compile Include="DAL\CaseHistoryRepository.cs" />
-    <Compile Include="DAL\CaseNoteRepository.cs" />
-    <Compile Include="DAL\CaseRepository.cs" />
-    <Compile Include="DAL\DashboardRepository.cs" />
-    <Compile Include="DAL\CaseStatusRepository.cs" />
-    <Compile Include="DAL\ContactRepository.cs" />
-    <Compile Include="DAL\CustomerRepository.cs" />
-    <Compile Include="DAL\DatabaseHelper.cs" />
-    <Compile Include="DAL\EngineerLevelRepository.cs" />
-    <Compile Include="DAL\PasswordHelper.cs" />
-    <Compile Include="DAL\PriorityRepository.cs" />
-    <Compile Include="DAL\ProgramRepository.cs" />
-    <Compile Include="DAL\RoleRepository.cs" />
-    <Compile Include="DAL\ScheduleRepository.cs" />
-    <Compile Include="DAL\SupportEngineerRepository.cs" />
-    <Compile Include="DAL\UserRepository.cs" />
-    <Compile Include="Models\Attachment.cs" />
-    <Compile Include="Models\Case.cs" />
-    <Compile Include="Models\CaseHistory.cs" />
-    <Compile Include="Models\CaseNote.cs" />
-    <Compile Include="Models\CaseStatus.cs" />
-    <Compile Include="Models\CaseViewModel.cs" />
-    <Compile Include="Models\Contact.cs" />
-    <Compile Include="Models\Customer.cs" />
-    <Compile Include="Models\EngineerLevel.cs" />
-    <Compile Include="Models\LoginUser.cs" />
-    <Compile Include="Models\Priority.cs" />
-    <Compile Include="Models\Role.cs" />
-    <Compile Include="Models\Schedule.cs" />
-    <Compile Include="Models\SignInViewModel.cs" />
-    <Compile Include="Models\SupportEngineer.cs" />
-    <Compile Include="Models\SupportProgram.cs" />
-    <Compile Include="Models\User.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -182,29 +148,12 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Model1.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Model1.edmx</DependentUpon>
-      <LastGenOutput>Model1.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Model1.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Model1.edmx</DependentUpon>
-      <LastGenOutput>Model1.cs</LastGenOutput>
-    </Content>
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
     <Content Include="Scripts\bootstrap.esm.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <EntityDeploy Include="Model1.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Model1.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Model1.edmx.diagram">
-      <DependentUpon>Model1.edmx</DependentUpon>
-    </Content>
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -268,6 +217,16 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ITSupport.Business\ITSupport.Business.csproj">
+      <Project>{c450b5ee-7c1f-402a-bf76-1d8e1c3edfb1}</Project>
+      <Name>ITSupport.Business</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ITSupport.Data\ITSupport.Data.csproj">
+      <Project>{c8d2d1ed-4395-4818-91cb-45ddc98cb17d}</Project>
+      <Name>ITSupport.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
