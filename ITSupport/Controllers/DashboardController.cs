@@ -1,12 +1,11 @@
 using System.Web.Mvc;
-using ITSupport.DAL;
+using ITSupport.Business;
 
 namespace ITSupport.Controllers
 {
     public class DashboardController : Controller
     {
-        private readonly UserRepository      _users     = new UserRepository();
-        private readonly DashboardRepository _dashboard = new DashboardRepository();
+        private readonly DashboardBusiness _dashboard = new DashboardBusiness();
 
         // POST /Dashboard/Index  — called by the Sign In form
         [HttpPost]
@@ -19,7 +18,7 @@ namespace ITSupport.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var user = _users.ValidateUser(email, password);
+            var user = _dashboard.ValidateUser(email, password);
 
             if (user == null)
             {
@@ -27,7 +26,7 @@ namespace ITSupport.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            _users.UpdateLastLogin(user.UserId);
+            _dashboard.UpdateLastLogin(user.UserId);
 
             Session["UserId"]     = user.UserId;
             Session["Username"]   = user.Username;
