@@ -3,7 +3,9 @@ using System.Data.SqlClient;
 
 namespace ITSupport.DAL
 {
-    public static class DatabaseHelper
+	// SOLID: SRP - unica responsabilidad: crear conexiones a la base de datos.
+	// DP: Factory Method - GetConnection()
+	public static class DatabaseHelper
     {
         private static readonly string _connectionString =
             ConfigurationManager.ConnectionStrings["TicketSystemDB"].ConnectionString;

@@ -1,6 +1,7 @@
+@model ITSupport.Models.Case
 @{
     Layout = null;
-    ViewBag.Title = "New Case";
+    ViewBag.Title = "Edit Case";
     var statuses = ViewBag.Statuses as List<ITSupport.Models.CaseStatus>;
     var priorities = ViewBag.Priorities as List<ITSupport.Models.Priority>;
     var contacts = ViewBag.Contacts as List<ITSupport.Models.Contact>;
@@ -14,7 +15,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IT Support — New Case</title>
+    <title>IT Support — Edit Case</title>
     @Styles.Render("~/Content/css")
     <style>
         *, *::before, *::after {
@@ -223,7 +224,7 @@
             max-width: 780px;
         }
 
-        /* Form card */
+        /* Alerts */
         .alert-error {
             background: #fde8ec;
             border: 1px solid #f5c2cb;
@@ -238,6 +239,7 @@
                 margin: .25rem 0 0 1.1rem;
             }
 
+        /* Form card */
         .form-card {
             background: #fff;
             border-radius: 14px;
@@ -371,8 +373,8 @@
         <ul class="sidebar-nav">
             <li class="nav-section-label">Main Menu</li>
             <li><a href="@Url.Action("Index","Dashboard")"><span class="nav-icon">&#9636;</span> Dashboard</a></li>
-            <li><a href="@Url.Action("Index","Cases")"><span class="nav-icon">&#128203;</span> All Cases</a></li>
-            <li><a href="@Url.Action("Create","Cases")" class="active"><span class="nav-icon">&#43;</span> New Case</a></li>
+            <li><a href="@Url.Action("Index","Cases")" class="active"><span class="nav-icon">&#128203;</span> All Cases</a></li>
+            <li><a href="@Url.Action("Create","Cases")"><span class="nav-icon">&#43;</span> New Case</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Management</li>
             <li><a href="#"><span class="nav-icon">&#128100;</span> Customers</a></li>
             <li><a href="#"><span class="nav-icon">&#128736;</span> Engineers</a></li>
@@ -397,8 +399,8 @@
         <header class="topbar">
             <a href="@Url.Action("Index","Cases")" class="btn-back">&#8592; Back</a>
             <div class="topbar-title">
-                <h2>New Case</h2>
-                <p>Fill in the details to open a support case</p>
+                <h2>Edit Case @Model.CaseNumber</h2>
+                <p>Update the details of this support case</p>
             </div>
         </header>
 
@@ -417,9 +419,11 @@
                 </div>
             }
 
-            @using (Html.BeginForm("Create", "Cases", FormMethod.Post))
+            @using (Html.BeginForm("Edit", "Cases", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.CaseId)
+                @Html.HiddenFor(m => m.CreatedByUserId)
 
                 <div class="form-card">
                     <div class="form-card-header">
@@ -429,15 +433,27 @@
 
                         <div class="form-group full">
                             <label>Title *</label>
-                            <input type="text" name="Title" class="form-control" placeholder="Brief description of the issue" required />
+                            <input type="text" name="Title" class="form-control" value="@Model.Title" required />
                         </div>
 
                         <div class="form-group full">
                             <label>Description *</label>
-                            <textarea name="Description" class="form-control" placeholder="Detailed explanation of the issue..." required></textarea>
+                            <textarea name="Description" class="form-control" required>@Model.Description</textarea>
                         </div>
 
                         <div class="form-row">
+                            <div class="form-group">
+                                <label>Status *</label>
+                                <select name="StatusId" class="form-control" required>
+                                    @if (statuses != null)
+                                    {
+                                        foreach (var s in statuses)
+                                        {
+                                            <option value="@s.StatusId" @(Model.StatusId == s.StatusId ? "selected" : "")>@s.StatusName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label>Priority *</label>
                                 <select name="PriorityId" class="form-control" required>
@@ -446,7 +462,7 @@
                                     {
                                         foreach (var p in priorities)
                                         {
-                                            <option value="@p.PriorityId">@p.PriorityName (SLA @p.SlaHours h)</option>
+                                            <option value="@p.PriorityId" @(Model.PriorityId == p.PriorityId ? "selected" : "")>@p.PriorityName (SLA @p.SlaHours h)</option>
                                         }
                                     }
                                 </select>
@@ -459,7 +475,7 @@
                                     {
                                         foreach (var c in contacts)
                                         {
-                                            <option value="@c.ContactId">@c.ContactName</option>
+                                            <option value="@c.ContactId" @(Model.ContactId == c.ContactId ? "selected" : "")>@c.ContactName</option>
                                         }
                                     }
                                 </select>
@@ -472,7 +488,7 @@
                                     {
                                         foreach (var p in programs)
                                         {
-                                            <option value="@p.ProgramId">@p.ProgramName</option>
+                                            <option value="@p.ProgramId" @(Model.ProgramId == p.ProgramId ? "selected" : "")>@p.ProgramName</option>
                                         }
                                     }
                                 </select>
@@ -485,22 +501,22 @@
                                     {
                                         foreach (var e in engineers)
                                         {
-                                            <option value="@e.EngineerId">@e.Name</option>
+                                            <option value="@e.EngineerId" @(Model.OwnerId == e.EngineerId ? "selected" : "")>@e.Name</option>
                                         }
                                     }
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Country *</label>
-                                <input type="text" name="Country" class="form-control" placeholder="e.g. Costa Rica" required />
+                                <input type="text" name="Country" class="form-control" value="@Model.Country" required />
                             </div>
                             <div class="form-group">
                                 <label>Preferred Contact</label>
                                 <select name="PreferredContact" class="form-control">
                                     <option value="">— Select —</option>
-                                    <option value="Email">Email</option>
-                                    <option value="Phone">Phone</option>
-                                    <option value="Portal">Portal</option>
+                                    <option value="Email" @(Model.PreferredContact == "Email" ? "selected" : "")>Email</option>
+                                    <option value="Phone" @(Model.PreferredContact == "Phone" ? "selected" : "")>Phone</option>
+                                    <option value="Portal" @(Model.PreferredContact == "Portal" ? "selected" : "")>Portal</option>
                                 </select>
                             </div>
                         </div>
@@ -508,7 +524,7 @@
                     </div>
                     <div class="form-footer">
                         <a href="@Url.Action("Index","Cases")" class="btn-cancel">Cancel</a>
-                        <button type="submit" class="btn-submit">Open Case</button>
+                        <button type="submit" class="btn-submit">Save Changes</button>
                     </div>
                 </div>
             }
