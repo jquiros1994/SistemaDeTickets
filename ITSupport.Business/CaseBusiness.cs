@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ITSupport.DAL;
 using ITSupport.Models;
+using ITSupport.Business.Results;
 
 namespace ITSupport.Business
 {
@@ -68,6 +69,18 @@ namespace ITSupport.Business
 
 			int newId = _repository.Insert(model);
 			return OperationResult.Ok(newId);
+		}
+
+		//This method helps to create model object from ITSupport.TicketReceiver 
+		public CaseCreationResult CreateExternalCase(string title, string description, int priorityId, int contactId, int programId, string country, int createdByUserId, string preferredContact)
+		{
+			Case model = new Case { Title = title, Description = description, PriorityId = priorityId, ContactId = contactId, ProgramId = programId, Country = country, CreatedByUserId = createdByUserId,PreferredContact = preferredContact};
+			OperationResult result = Create(model);
+			return new CaseCreationResult
+			{
+				Success = result.Success,
+				Message = result.Success ? "Case created successfully." : string.Join(", ", result.Errors), CaseId = result.Success ? result.RecordId: 0
+			};
 		}
 
 		public OperationResult Update(Case model)

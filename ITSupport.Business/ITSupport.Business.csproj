@@ -73,6 +73,7 @@
     <Compile Include="CaseBusiness.cs" />
     <Compile Include="DashboardBusiness.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Results\CaseCreationResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

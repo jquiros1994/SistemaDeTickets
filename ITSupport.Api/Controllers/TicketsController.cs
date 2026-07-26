@@ -1,15 +1,18 @@
 ﻿using System.Web.Http;
+using ITSupport.Api.DTOs;
+using ITSupport.TicketReceiver.DTOs;
+using ITSupport.TicketReceiver.Services;
 
-namespace ITSupport.Api.Controllers
+namespace ITSupport.TicketReceiver.Controllers
 {
-    [RoutePrefix("api/tickets")]
-public class TicketsController : ApiController
-{
-    [HttpGet]
-    [Route("")]
-    public IHttpActionResult Test()
+    public class TicketsController : ApiController
     {
-        return Ok("Ticket Receiver funcionando correctamente.");
+        [HttpPost]
+        public IHttpActionResult Create(CreateTicketRequest request)
+        {
+            TicketService service = new TicketService();
+            CreateTicketResponse response = service.CreateTicket(request);
+            return Ok(response);
+        }
     }
-}
 }
