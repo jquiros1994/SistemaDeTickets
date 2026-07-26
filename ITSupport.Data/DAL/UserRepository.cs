@@ -145,6 +145,19 @@ namespace ITSupport.DAL
             }
         }
 
+        public bool ResetPassword(string email, string newPasswordHash)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            using (var cmd = new SqlCommand(
+                "UPDATE Users SET PasswordHash = @PasswordHash WHERE Email = @Email", conn))
+            {
+                cmd.Parameters.AddWithValue("@Email", email);
+                cmd.Parameters.AddWithValue("@PasswordHash", newPasswordHash);
+                conn.Open();
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
         public bool Delete(int userId)
         {
             using (var conn = DatabaseHelper.GetConnection())

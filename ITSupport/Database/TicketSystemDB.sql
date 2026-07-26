@@ -231,7 +231,7 @@ INSERT INTO Users (Username, Email, PasswordHash, RoleId, CustomerId, EngineerId
 VALUES (
     'Super.Admin',
     'Super.admin@support.com',
-    'admin',  -- hash de "admin"
+    'AN3z6qw3Rf9hr7NTtZAeiutLmxqD8C4qCMjMGs5zcfM3QuPR2bQpFspooD9gazWAcw==',  -- Crypto.HashPassword("admin123")
     1,        -- RoleId 1 = Admin
     NULL,
     NULL,
@@ -413,17 +413,17 @@ INSERT INTO SupportEngineers (Name, Email, PhoneNumber, LevelId, ScheduleId) VAL
     ('Pedro Vargas', 'pedro.vargas@support.com',  '+1 555-001-0003', 3, 3);
 GO
 
--- Sample users (passwords must be hashed by the app; placeholder here)
+-- Sample users (PasswordHash = Crypto.HashPassword("admin123") for all seed accounts)
 INSERT INTO Users (Username, Email, PasswordHash, RoleId, EngineerId) VALUES
-    ('admin',       'admin@support.com',         'HASH_PLACEHOLDER', 1, NULL),
-    ('alex.rivera', 'alex.rivera@support.com',   'HASH_PLACEHOLDER', 2, 1),
-    ('sara.kim',    'sara.kim@support.com',       'HASH_PLACEHOLDER', 2, 2),
-    ('pedro.vargas','pedro.vargas@support.com',   'HASH_PLACEHOLDER', 2, 3);
+    ('admin',       'admin@support.com',         'ANqiVCi7hxU8oXmCdK62n9LQU4AM3xheZJjvqeE2xSE6WhspnB1VD1iz5HOzLPwxGw==', 1, NULL),
+    ('alex.rivera', 'alex.rivera@support.com',   'AJZBAT92PhypipwArBUj6/3xRELIgaaFQtvhqQEVWWNg/ddikwbr5+Q4vkW5Tk0qeA==', 2, 1),
+    ('sara.kim',    'sara.kim@support.com',       'ANhVZ6QEydwGuA5tL51e7TmYDaJxuV7QbNS+Xz9WZ2rVD/Y96D171DtQq/L3COCkUw==', 2, 2),
+    ('pedro.vargas','pedro.vargas@support.com',   'APqGRE/dcDyc9qlsmQJBm1WZOp8GkfNakDbIPGCIc4SQaTKnD/gMNSKILB5GOrQfMg==', 2, 3);
 
 INSERT INTO Users (Username, Email, PasswordHash, RoleId, CustomerId) VALUES
-    ('maria.gonzalez','maria.gonzalez@acme.com',   'HASH_PLACEHOLDER', 3, 1),
-    ('john.smith',    'john.smith@globex.com',      'HASH_PLACEHOLDER', 3, 2),
-    ('lucia.fernandez','lucia.fernandez@initec.com','HASH_PLACEHOLDER', 3, 3);
+    ('maria.gonzalez','maria.gonzalez@acme.com',   'AO3Q5R/2mzlT9xdYJVrAQC/cEVSq4BwGCCPcXTA66HzbPj214vxAqPn2mMdR60bzpg==', 3, 1),
+    ('john.smith',    'john.smith@globex.com',      'AHKn6Zh+qp6teS1sm/H5Qxfp5jWAcTBVbFyWu0W7q0iFPBL852W2r5tMnRHhIZ+u3w==', 3, 2),
+    ('lucia.fernandez','lucia.fernandez@initec.com','AHqS3ePFj5mQjZVdGKEBTEwEXsgMzr1JjzUYh6R3wfx9BOY6yA0es4N8oVDF9S4abw==', 3, 3);
 GO
 
 -- Sample cases

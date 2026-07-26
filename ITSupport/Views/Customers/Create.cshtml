@@ -1,11 +1,7 @@
-@model ITSupport.Models.Case
+@model ITSupport.Models.Customer
 @{
     Layout = null;
-    ViewBag.Title = "Edit Case";
-    var statuses = ViewBag.Statuses as List<ITSupport.Models.CaseStatus>;
-    var priorities = ViewBag.Priorities as List<ITSupport.Models.Priority>;
-    var contacts = ViewBag.Contacts as List<ITSupport.Models.Contact>;
-    var engineers = ViewBag.Engineers as List<ITSupport.Models.SupportEngineer>;
+    ViewBag.Title = "New Customer";
     var programs = ViewBag.Programs as List<ITSupport.Models.SupportProgram>;
     var errors = ViewBag.Errors as List<string>;
 }
@@ -15,7 +11,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IT Support — Edit Case</title>
+    <title>IT Support — New Customer</title>
     @Styles.Render("~/Content/css")
     <style>
         *, *::before, *::after {
@@ -224,7 +220,7 @@
             max-width: 780px;
         }
 
-        /* Alerts */
+        /* Form card */
         .alert-error {
             background: #fde8ec;
             border: 1px solid #f5c2cb;
@@ -239,7 +235,6 @@
                 margin: .25rem 0 0 1.1rem;
             }
 
-        /* Form card */
         .form-card {
             background: #fff;
             border-radius: 14px;
@@ -306,11 +301,6 @@
                 box-shadow: 0 0 0 3px rgba(15,52,96,.1);
             }
 
-        textarea.form-control {
-            resize: vertical;
-            min-height: 110px;
-        }
-
         select.form-control {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23999' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
@@ -373,10 +363,10 @@
         <ul class="sidebar-nav">
             <li class="nav-section-label">Main Menu</li>
             <li><a href="@Url.Action("Index","Dashboard")"><span class="nav-icon">&#9636;</span> Dashboard</a></li>
-            <li><a href="@Url.Action("Index","Cases")" class="active"><span class="nav-icon">&#128203;</span> All Cases</a></li>
+            <li><a href="@Url.Action("Index","Cases")"><span class="nav-icon">&#128203;</span> All Cases</a></li>
             <li><a href="@Url.Action("Create","Cases")"><span class="nav-icon">&#43;</span> New Case</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Management</li>
-            <li><a href="@Url.Action("Index","Customers")"><span class="nav-icon">&#128100;</span> Customers</a></li>
+            <li><a href="@Url.Action("Index","Customers")" class="active"><span class="nav-icon">&#128100;</span> Customers</a></li>
             <li><a href="#"><span class="nav-icon">&#128736;</span> Engineers</a></li>
             <li><a href="#"><span class="nav-icon">&#128202;</span> Reports</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Settings</li>
@@ -397,10 +387,10 @@
     <!-- Main -->
     <div class="main-content">
         <header class="topbar">
-            <a href="@Url.Action("Index","Cases")" class="btn-back">&#8592; Back</a>
+            <a href="@Url.Action("Index","Customers")" class="btn-back">&#8592; Back</a>
             <div class="topbar-title">
-                <h2>Edit Case @Model.CaseNumber</h2>
-                <p>Update the details of this support case</p>
+                <h2>New Customer</h2>
+                <p>Add a new customer account</p>
             </div>
         </header>
 
@@ -414,71 +404,41 @@
                         @foreach (var e in errors)
                         {
                             <li>@e</li>
-}
+                        }
                     </ul>
                 </div>
             }
 
-            @using (Html.BeginForm("Edit", "Cases", FormMethod.Post))
+            @using (Html.BeginForm("Create", "Customers", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                @Html.HiddenFor(m => m.CaseId)
-                @Html.HiddenFor(m => m.CreatedByUserId)
 
                 <div class="form-card">
                     <div class="form-card-header">
-                        <h3>Case Information</h3>
+                        <h3>Customer Information</h3>
                     </div>
                     <div class="form-card-body">
 
-                        <div class="form-group full">
-                            <label>Title *</label>
-                            <input type="text" name="Title" class="form-control" value="@Model.Title" required />
-                        </div>
-
-                        <div class="form-group full">
-                            <label>Description *</label>
-                            <textarea name="Description" class="form-control" required>@Model.Description</textarea>
-                        </div>
-
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Status *</label>
-                                <select name="StatusId" class="form-control" required>
-                                    @if (statuses != null)
-                                    {
-                                        foreach (var s in statuses)
-                                        {
-                                            <option value="@s.StatusId" @(Model.StatusId == s.StatusId ? "selected" : "")>@s.StatusName</option>
-                                        }
-                                    }
-                                </select>
+                                <label>First Name *</label>
+                                <input type="text" name="FirstName" class="form-control" value="" placeholder="e.g. Maria" required />
                             </div>
                             <div class="form-group">
-                                <label>Priority *</label>
-                                <select name="PriorityId" class="form-control" required>
-                                    <option value="">— Select priority —</option>
-                                    @if (priorities != null)
-                                    {
-                                        foreach (var p in priorities)
-                                        {
-                                            <option value="@p.PriorityId" @(Model.PriorityId == p.PriorityId ? "selected" : "")>@p.PriorityName (SLA @p.SlaHours h)</option>
-                                        }
-                                    }
-                                </select>
+                                <label>Last Name *</label>
+                                <input type="text" name="LastName" class="form-control" value="" placeholder="e.g. Gonzalez" required />
                             </div>
                             <div class="form-group">
-                                <label>Contact *</label>
-                                <select name="ContactId" class="form-control" required>
-                                    <option value="">— Select contact —</option>
-                                    @if (contacts != null)
-                                    {
-                                        foreach (var c in contacts)
-                                        {
-                                            <option value="@c.ContactId" @(Model.ContactId == c.ContactId ? "selected" : "")>@c.ContactName</option>
-                                        }
-                                    }
-                                </select>
+                                <label>Email *</label>
+                                <input type="email" name="Email" class="form-control" value=" " placeholder="customer@company.com" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="text" name="PhoneNumber" class="form-control" value="" placeholder="+506 8888-1111" />
+                            </div>
+                            <div class="form-group">
+                                <label>Country *</label>
+                                <input type="text" name="Country" class="form-control" value="" placeholder="e.g. Costa Rica" required />
                             </div>
                             <div class="form-group">
                                 <label>Program *</label>
@@ -488,43 +448,17 @@
                                     {
                                         foreach (var p in programs)
                                         {
-                                            <option value="@p.ProgramId" @(Model.ProgramId == p.ProgramId ? "selected" : "")>@p.ProgramName</option>
+                                            <option value="@p.ProgramId">@p.ProgramName</option>
                                         }
                                     }
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Assigned Engineer</label>
-                                <select name="OwnerId" class="form-control">
-                                    <option value="">— Unassigned —</option>
-                                    @if (engineers != null)
-                                    {
-                                        foreach (var e in engineers)
-                                        {
-                                            <option value="@e.EngineerId" @(Model.OwnerId == e.EngineerId ? "selected" : "")>@e.Name</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Country *</label>
-                                <input type="text" name="Country" class="form-control" value="@Model.Country" required />
-                            </div>
-                            <div class="form-group">
-                                <label>Preferred Contact</label>
-                                <select name="PreferredContact" class="form-control">
-                                    <option value="">— Select —</option>
-                                    <option value="Email" @(Model.PreferredContact == "Email" ? "selected" : "")>Email</option>
-                                    <option value="Phone" @(Model.PreferredContact == "Phone" ? "selected" : "")>Phone</option>
-                                    <option value="Portal" @(Model.PreferredContact == "Portal" ? "selected" : "")>Portal</option>
                                 </select>
                             </div>
                         </div>
 
                     </div>
                     <div class="form-footer">
-                        <a href="@Url.Action("Index","Cases")" class="btn-cancel">Cancel</a>
-                        <button type="submit" class="btn-submit">Save Changes</button>
+                        <a href="@Url.Action("Index","Customers")" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit">Create Customer</button>
                     </div>
                 </div>
             }
