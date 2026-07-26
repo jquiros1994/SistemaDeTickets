@@ -3,13 +3,13 @@
 namespace ITSupport.Api.Controllers
 {
     [RoutePrefix("api/tickets")]
-    public class TicketsController : ApiController
+public class TicketsController : ApiController
+{
+    [HttpGet]
+    [Route("")]
+    public IHttpActionResult Test()
     {
-        [HttpGet]
-        [Route("")]
-        public IHttpActionResult Test()
-        {
-            return Ok("Ticket Receiver funcionando correctamente.");
-        }
+        return Ok("Ticket Receiver funcionando correctamente.");
     }
+}
 }
