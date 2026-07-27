@@ -1,7 +1,8 @@
-﻿using System.Web.Http;
-using ITSupport.Api.DTOs;
+﻿using ITSupport.Api.DTOs;
 using ITSupport.TicketReceiver.DTOs;
+using ITSupport.TicketReceiver.Observers;
 using ITSupport.TicketReceiver.Services;
+using System.Web.Http;
 
 namespace ITSupport.TicketReceiver.Controllers
 {

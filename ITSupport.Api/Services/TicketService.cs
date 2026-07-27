@@ -1,16 +1,40 @@
 ﻿using ITSupport.Api.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using ITSupport.TicketReceiver.DTOs;
 using ITSupport.Business;
 using ITSupport.Business.Results;
+using ITSupport.TicketReceiver.DTOs;
+using ITSupport.TicketReceiver.Observers;
+using System.Collections.Generic;
 
 namespace ITSupport.TicketReceiver.Services
 {
     public class TicketService
     {
+        private readonly List<ITicketObserver> _observers = new List<ITicketObserver>();
+
+        public TicketService()
+        {
+            // Registramos los observers
+            Attach(new EmailObserver());
+        }
+
+        public void Attach(ITicketObserver observer)
+        {
+            _observers.Add(observer);
+        }
+
+        public void Detach(ITicketObserver observer)
+        {
+            _observers.Remove(observer);
+        }
+
+        private void Notify(CreateTicketResponse response)
+        {
+            foreach (ITicketObserver observer in _observers)
+            {
+                observer.Update(response);
+            }
+        }
+
         public CreateTicketResponse CreateTicket(CreateTicketRequest request)
         {
             CaseBusiness business = new CaseBusiness();
@@ -25,12 +49,20 @@ namespace ITSupport.TicketReceiver.Services
                 1,
                 "Portal");
 
-            return new CreateTicketResponse
+            CreateTicketResponse response = new CreateTicketResponse
             {
                 Success = result.Success,
                 Message = result.Message,
                 TicketId = result.CaseId
             };
+
+            // Solo notificamos si el ticket se creó correctamente
+            if (response.Success)
+            {
+                Notify(response);
+            }
+
+            return response;
         }
     }
 }
