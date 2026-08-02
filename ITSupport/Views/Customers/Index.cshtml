@@ -1,10 +1,7 @@
-@model List<ITSupport.Models.CaseViewModel>
+@model List<ITSupport.Models.Customer>
 @{
     Layout = null;
-    ViewBag.Title = "Cases";
-    var statuses = ViewBag.Statuses as List<ITSupport.Models.CaseStatus>;
-    int? activeStatus = ViewBag.StatusId as int?;
-    string search = ViewBag.Search as string;
+    ViewBag.Title = "Customers";
 }
 
 <!DOCTYPE html>
@@ -12,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IT Support — Cases</title>
+    <title>IT Support — Customers</title>
     @Styles.Render("~/Content/css")
     <style>
         *, *::before, *::after {
@@ -224,79 +221,6 @@
             flex: 1;
         }
 
-        /* Filter bar */
-        .filter-bar {
-            background: #fff;
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,.06);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-tabs {
-            display: flex;
-            gap: .4rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-tab {
-            padding: .35rem .85rem;
-            border-radius: 20px;
-            font-size: .78rem;
-            font-weight: 600;
-            border: 1.5px solid #e0e0e0;
-            background: #fff;
-            color: #666;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all .2s;
-        }
-
-            .filter-tab:hover {
-                border-color: #533483;
-                color: #533483;
-            }
-
-            .filter-tab.active {
-                background: linear-gradient(135deg,#0f3460,#533483);
-                color: #fff;
-                border-color: transparent;
-            }
-
-        .search-box {
-            margin-left: auto;
-            display: flex;
-            gap: .5rem;
-        }
-
-            .search-box input {
-                border: 1.5px solid #e0e0e0;
-                border-radius: 8px;
-                padding: .4rem .85rem;
-                font-size: .85rem;
-                outline: none;
-                transition: border-color .2s;
-            }
-
-                .search-box input:focus {
-                    border-color: #0f3460;
-                }
-
-            .search-box button {
-                background: #0f3460;
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: .4rem .85rem;
-                font-size: .82rem;
-                font-weight: 600;
-                cursor: pointer;
-            }
-
         /* Table card */
         .section-card {
             background: #fff;
@@ -324,12 +248,12 @@
             color: #aaa;
         }
 
-        .cases-table {
+        .customers-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-            .cases-table thead th {
+            .customers-table thead th {
                 padding: .7rem 1.2rem;
                 font-size: .7rem;
                 font-weight: 700;
@@ -342,79 +266,30 @@
                 white-space: nowrap;
             }
 
-            .cases-table tbody tr {
+            .customers-table tbody tr {
                 border-bottom: 1px solid #f8f8f8;
                 transition: background .15s;
             }
 
-                .cases-table tbody tr:last-child {
+                .customers-table tbody tr:last-child {
                     border-bottom: none;
                 }
 
-                .cases-table tbody tr:hover {
+                .customers-table tbody tr:hover {
                     background: #fafbff;
                 }
 
-            .cases-table tbody td {
+            .customers-table tbody td {
                 padding: .8rem 1.2rem;
                 font-size: .85rem;
                 color: #444;
                 vertical-align: middle;
             }
 
-        .case-number {
-            font-weight: 700;
-            color: #0f3460;
-            font-size: .78rem;
-            font-family: monospace;
-        }
-
-        .case-title-link {
-            font-weight: 500;
+        .customer-name {
+            font-weight: 600;
             color: #222;
-            text-decoration: none;
-            max-width: 230px;
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
-
-            .case-title-link:hover {
-                color: #533483;
-                text-decoration: underline;
-            }
-
-        /* Badges */
-        .badge-priority {
-            display: inline-block;
-            padding: .22rem .6rem;
-            border-radius: 20px;
-            font-size: .7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .4px;
-        }
-
-            .badge-priority.Critical {
-                background: #fde8ec;
-                color: #c0152a;
-            }
-
-            .badge-priority.High {
-                background: #fff3e0;
-                color: #e65100;
-            }
-
-            .badge-priority.Medium {
-                background: #e8f5e9;
-                color: #2e7d32;
-            }
-
-            .badge-priority.Low {
-                background: #e8f0fe;
-                color: #1565c0;
-            }
 
         .badge-status {
             display: inline-flex;
@@ -435,55 +310,15 @@
                 flex-shrink: 0;
             }
 
-            .badge-status.New {
-                background: #e8f0fe;
-                color: #1565c0;
-            }
-
-            .badge-status.Assigned {
-                background: #f3e5f5;
-                color: #6a1b9a;
-            }
-
-            .badge-status.In-Progress {
-                background: #fff8e1;
-                color: #f57f17;
-            }
-
-            .badge-status.Pending {
-                background: #fce4ec;
-                color: #880e4f;
-            }
-
-            .badge-status.Escalated {
-                background: #fde8ec;
-                color: #c0152a;
-            }
-
-            .badge-status.Resolved {
+            .badge-status.Active {
                 background: #e6f9f1;
                 color: #1b5e20;
             }
 
-            .badge-status.Closed {
-                background: #f5f5f5;
-                color: #757575;
-            }
-
-            .badge-status.Cancelled {
+            .badge-status.Inactive {
                 background: #f5f5f5;
                 color: #9e9e9e;
             }
-
-        .owner-cell {
-            font-size: .82rem;
-            color: #666;
-        }
-
-        .unassigned {
-            color: #bbb;
-            font-style: italic;
-        }
 
         .time-cell {
             font-size: .76rem;
@@ -522,39 +357,6 @@
             border: 1px solid #f5c2cb;
             color: #c0152a;
         }
-
-        /* Row actions */
-        .row-actions {
-            display: flex;
-            gap: .4rem;
-            white-space: nowrap;
-        }
-
-        .btn-action {
-            border: none;
-            border-radius: 7px;
-            padding: .3rem .7rem;
-            font-size: .74rem;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: opacity .2s;
-        }
-
-            .btn-action:hover {
-                opacity: .85;
-            }
-
-        .btn-edit {
-            background: #e8f0fe;
-            color: #1565c0;
-        }
-
-        .btn-delete {
-            background: #fde8ec;
-            color: #c0152a;
-        }
     </style>
 </head>
 <body>
@@ -568,10 +370,10 @@
         <ul class="sidebar-nav">
             <li class="nav-section-label">Main Menu</li>
             <li><a href="@Url.Action("Index","Dashboard")"><span class="nav-icon">&#9636;</span> Dashboard</a></li>
-            <li><a href="@Url.Action("Index","Cases")" class="active"><span class="nav-icon">&#128203;</span> All Cases</a></li>
+            <li><a href="@Url.Action("Index","Cases")"><span class="nav-icon">&#128203;</span> All Cases</a></li>
             <li><a href="@Url.Action("Create","Cases")"><span class="nav-icon">&#43;</span> New Case</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Management</li>
-            <li><a href="@Url.Action("Index","Customers")"><span class="nav-icon">&#128100;</span> Customers</a></li>
+            <li><a href="@Url.Action("Index","Customers")" class="active"><span class="nav-icon">&#128100;</span> Customers</a></li>
             <li><a href="@Url.Action("Index","Engineers")"><span class="nav-icon">&#128736;</span> Engineers</a></li>
             <li><a href="#"><span class="nav-icon">&#128202;</span> Reports</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Settings</li>
@@ -593,11 +395,11 @@
     <div class="main-content">
         <header class="topbar">
             <div class="topbar-title">
-                <h2>All Cases</h2>
-                <p>@Model.Count case(s) found</p>
+                <h2>Customers</h2>
+                <p>@Model.Count customer(s) found</p>
             </div>
             <div>
-                <a href="@Url.Action("Create","Cases")" class="btn-new">&#43; New Case</a>
+                <a href="@Url.Action("Create","Customers")" class="btn-new">&#43; New Customer</a>
             </div>
         </header>
 
@@ -612,94 +414,47 @@
                 <div class="alert alert-danger">&#9888; @TempData["Error"]</div>
             }
 
-            <!-- Filter bar -->
-            <form method="get" action="@Url.Action("Index","Cases")">
-                <div class="filter-bar">
-                    <div class="filter-tabs">
-                        <a href="@Url.Action("Index","Cases")"
-                           class="filter-tab @(activeStatus == null && string.IsNullOrEmpty(search) ? "active" : "")">All</a>
-                        @if (statuses != null)
-                        {
-                            foreach (var s in statuses)
-                            {
-                                <a href="@Url.Action("Index","Cases", new { statusId = s.StatusId, search })"
-                                   class="filter-tab @(activeStatus == s.StatusId ? "active" : "")">
-                                    @s.StatusName
-                                </a>
-                            }
-                        }
-                    </div>
-                    <div class="search-box">
-                        <input type="hidden" name="statusId" value="@(activeStatus.HasValue ? activeStatus.ToString() : "")" />
-                        <input type="text" name="search" value="@search" placeholder="Search cases..." />
-                        <button type="submit">Search</button>
-                    </div>
-                </div>
-            </form>
-
-            <!-- Cases Table -->
+            <!-- Customers Table -->
             <div class="section-card">
                 <div class="section-header">
-                    <h3>Cases</h3>
+                    <h3>All Customers</h3>
                     <span class="result-count">@Model.Count result(s)</span>
                 </div>
                 @if (Model.Count == 0)
                 {
                     <div class="empty-state">
-                        <div style="font-size:2rem">&#128203;</div>
-                        <p>No cases found matching your criteria.</p>
+                        <div style="font-size:2rem">&#128100;</div>
+                        <p>No customers found yet.</p>
                     </div>
                 }
                 else
                 {
-                    <table class="cases-table">
+                    <table class="customers-table">
                         <thead>
                             <tr>
-                                <th>Case #</th>
-                                <th>Title</th>
-                                <th>Priority</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Country</th>
                                 <th>Status</th>
-                                <th>Customer</th>
-                                <th>Owner</th>
-                                <th>Program</th>
-                                <th>Opened</th>
-                                <th>Actions</th>
+                                <th>Created</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var c in Model)
                             {
-                                string statusClass = c.StatusName.Replace(" ", "-");
                                 <tr>
-                                    <td><span class="case-number">@c.CaseNumber</span></td>
+                                    <td><span class="customer-name">@c.FullName</span></td>
+                                    <td>@c.Email</td>
+                                    <td>@(string.IsNullOrEmpty(c.PhoneNumber) ? "—" : c.PhoneNumber)</td>
+                                    <td>@c.Country</td>
                                     <td>
-                                        <a href="@Url.Action("Details","Cases", new { id = c.CaseId })"
-                                           class="case-title-link" title="@c.Title">@c.Title</a>
-                                    </td>
-                                    <td><span class="badge-priority @c.PriorityName">@c.PriorityName</span></td>
-                                    <td><span class="badge-status @statusClass">@c.StatusName</span></td>
-                                    <td>@c.ContactName</td>
-                                    <td>
-                                        @if (string.IsNullOrEmpty(c.OwnerName))
-                                        {<span class="unassigned">Unassigned</span> }
+                                        @if (c.IsActive)
+                                        { <span class="badge-status Active">Active</span> }
                                         else
-                                        { <span class="owner-cell">@c.OwnerName</span>}
+                                        { <span class="badge-status Inactive">Inactive</span> }
                                     </td>
-                                    <td style="font-size:.78rem;color:#888">@c.ProgramName</td>
                                     <td><span class="time-cell">@c.CreatedAt.ToString("MMM dd, yyyy")</span></td>
-                                    <td>
-                                        <div class="row-actions">
-                                            <a href="@Url.Action("Edit","Cases", new { id = c.CaseId })" class="btn-action btn-edit">Edit</a>
-                                            @using (Html.BeginForm("Delete", "Cases", new { id = c.CaseId }, FormMethod.Post))
-                                            {
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn-action btn-delete"
-                                                        onclick="return confirm('Are you sure you want to delete case @c.CaseNumber?');">
-                                                    Delete
-                                                </button>
-                                            }
-                                        </div>
-                                    </td>
                                 </tr>
                             }
                         </tbody>

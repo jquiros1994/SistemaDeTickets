@@ -18,6 +18,12 @@ namespace ITSupport.Business
             _users.UpdateLastLogin(userId);
         }
 
+        public bool ResetPassword(string email, string newPassword)
+        {
+            var hash = PasswordHelper.Hash(newPassword);
+            return _users.ResetPassword(email, hash);
+        }
+
         public int GetOpenCasesCount()
         {
             return _dashboard.GetOpenCasesCount();
