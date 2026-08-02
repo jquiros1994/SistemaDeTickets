@@ -185,6 +185,7 @@ CREATE TABLE SupportEngineers (
     PhoneNumber NVARCHAR(30)  NULL,
     LevelId     INT           NOT NULL,
     ScheduleId  INT           NOT NULL,
+    JobTitle    NVARCHAR(100) NOT NULL CONSTRAINT DF_Engineers_JobTitle DEFAULT 'Support Engineer',
     IsActive    BIT           NOT NULL CONSTRAINT DF_Engineers_IsActive DEFAULT 1,
 
     CONSTRAINT PK_SupportEngineers       PRIMARY KEY (EngineerId),

@@ -140,6 +140,7 @@
     <Compile Include="DAL\PasswordHelper.cs" />
     <Compile Include="DAL\PriorityRepository.cs" />
     <Compile Include="DAL\ProgramRepository.cs" />
+    <Compile Include="DAL\ReportsRepository.cs" />
     <Compile Include="DAL\RoleRepository.cs" />
     <Compile Include="DAL\ScheduleRepository.cs" />
     <Compile Include="DAL\SupportEngineerRepository.cs" />
@@ -172,8 +173,10 @@
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\EngineerLevel.cs" />
+    <Compile Include="Models\EngineerViewModel.cs" />
     <Compile Include="Models\LoginUser.cs" />
     <Compile Include="Models\Priority.cs" />
+    <Compile Include="Models\ReportModels.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\SignInViewModel.cs" />

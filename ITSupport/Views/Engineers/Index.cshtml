@@ -1,7 +1,7 @@
-@model List<ITSupport.Models.Customer>
+@model List<ITSupport.Models.EngineerViewModel>
 @{
     Layout = null;
-    ViewBag.Title = "Customers";
+    ViewBag.Title = "Engineers";
 }
 
 <!DOCTYPE html>
@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IT Support — Customers</title>
+    <title>IT Support — Engineers</title>
     @Styles.Render("~/Content/css")
     <style>
         *, *::before, *::after {
@@ -195,27 +195,6 @@
             margin-top: 1px;
         }
 
-        .btn-new {
-            background: linear-gradient(135deg,#0f3460,#533483);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: .45rem 1.1rem;
-            font-size: .85rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            transition: opacity .2s;
-        }
-
-            .btn-new:hover {
-                opacity: .88;
-                color: #fff;
-            }
-
         .page-body {
             padding: 1.75rem;
             flex: 1;
@@ -248,12 +227,12 @@
             color: #aaa;
         }
 
-        .customers-table {
+        .engineers-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-            .customers-table thead th {
+            .engineers-table thead th {
                 padding: .7rem 1.2rem;
                 font-size: .7rem;
                 font-weight: 700;
@@ -266,29 +245,39 @@
                 white-space: nowrap;
             }
 
-            .customers-table tbody tr {
+            .engineers-table tbody tr {
                 border-bottom: 1px solid #f8f8f8;
                 transition: background .15s;
             }
 
-                .customers-table tbody tr:last-child {
+                .engineers-table tbody tr:last-child {
                     border-bottom: none;
                 }
 
-                .customers-table tbody tr:hover {
+                .engineers-table tbody tr:hover {
                     background: #fafbff;
                 }
 
-            .customers-table tbody td {
+            .engineers-table tbody td {
                 padding: .8rem 1.2rem;
                 font-size: .85rem;
                 color: #444;
                 vertical-align: middle;
             }
 
-        .customer-name {
+        .engineer-name {
             font-weight: 600;
             color: #222;
+        }
+
+        .badge-level {
+            display: inline-block;
+            padding: .22rem .65rem;
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            background: #f0ebff;
+            color: #533483;
         }
 
         .badge-status {
@@ -320,12 +309,6 @@
                 color: #9e9e9e;
             }
 
-        .time-cell {
-            font-size: .76rem;
-            color: #bbb;
-            white-space: nowrap;
-        }
-
         .empty-state {
             padding: 3rem;
             text-align: center;
@@ -336,27 +319,6 @@
                 margin-top: .5rem;
                 font-size: .85rem;
             }
-
-        /* Alerts */
-        .alert {
-            border-radius: 10px;
-            padding: .75rem 1.1rem;
-            margin-bottom: 1.1rem;
-            font-size: .85rem;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #e6f9f1;
-            border: 1px solid #bfe8d4;
-            color: #1b5e20;
-        }
-
-        .alert-danger {
-            background: #fde8ec;
-            border: 1px solid #f5c2cb;
-            color: #c0152a;
-        }
     </style>
 </head>
 <body>
@@ -373,9 +335,9 @@
             <li><a href="@Url.Action("Index","Cases")"><span class="nav-icon">&#128203;</span> All Cases</a></li>
             <li><a href="@Url.Action("Create","Cases")"><span class="nav-icon">&#43;</span> New Case</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Management</li>
-            <li><a href="@Url.Action("Index","Customers")" class="active"><span class="nav-icon">&#128100;</span> Customers</a></li>
-            <li><a href="@Url.Action("Index","Engineers")"><span class="nav-icon">&#128736;</span> Engineers</a></li>
-            <li><a href="#"><span class="nav-icon">&#128202;</span> Reports</a></li>
+            <li><a href="@Url.Action("Index","Customers")"><span class="nav-icon">&#128100;</span> Customers</a></li>
+            <li><a href="@Url.Action("Index","Engineers")" class="active"><span class="nav-icon">&#128736;</span> Engineers</a></li>
+            <li><a href="@Url.Action("Index","Reports")"><span class="nav-icon">&#128202;</span> Reports</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Settings</li>
             <li><a href="@Url.Action("Index","Configuration")"><span class="nav-icon">&#9881;</span> Configuration</a></li>
         </ul>
@@ -395,66 +357,54 @@
     <div class="main-content">
         <header class="topbar">
             <div class="topbar-title">
-                <h2>Customers</h2>
-                <p>@Model.Count customer(s) found</p>
-            </div>
-            <div>
-                <a href="@Url.Action("Create","Customers")" class="btn-new">&#43; New Customer</a>
+                <h2>Engineers</h2>
+                <p>@Model.Count engineer(s) found</p>
             </div>
         </header>
 
         <div class="page-body">
 
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success">&#10003; @TempData["Success"]</div>
-            }
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger">&#9888; @TempData["Error"]</div>
-            }
-
-            <!-- Customers Table -->
+            <!-- Engineers Table -->
             <div class="section-card">
                 <div class="section-header">
-                    <h3>All Customers</h3>
+                    <h3>All Engineers</h3>
                     <span class="result-count">@Model.Count result(s)</span>
                 </div>
                 @if (Model.Count == 0)
                 {
                     <div class="empty-state">
-                        <div style="font-size:2rem">&#128100;</div>
-                        <p>No customers found yet.</p>
+                        <div style="font-size:2rem">&#128736;</div>
+                        <p>No engineers found yet.</p>
                     </div>
                 }
                 else
                 {
-                    <table class="customers-table">
+                    <table class="engineers-table">
                         <thead>
                             <tr>
                                 <th>Name</th>
+                                <th>Job Title</th>
+                                <th>Level</th>
                                 <th>Email</th>
                                 <th>Phone</th>
-                                <th>Country</th>
                                 <th>Status</th>
-                                <th>Created</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var c in Model)
+                            @foreach (var e in Model)
                             {
                                 <tr>
-                                    <td><span class="customer-name">@c.FullName</span></td>
-                                    <td>@c.Email</td>
-                                    <td>@(string.IsNullOrEmpty(c.PhoneNumber) ? "—" : c.PhoneNumber)</td>
-                                    <td>@c.Country</td>
+                                    <td><span class="engineer-name">@e.Name</span></td>
+                                    <td>@e.JobTitle</td>
+                                    <td><span class="badge-level">@e.LevelName</span></td>
+                                    <td>@e.Email</td>
+                                    <td>@(string.IsNullOrEmpty(e.PhoneNumber) ? "—" : e.PhoneNumber)</td>
                                     <td>
-                                        @if (c.IsActive)
+                                        @if (e.IsActive)
                                         { <span class="badge-status Active">Active</span> }
                                         else
                                         { <span class="badge-status Inactive">Inactive</span> }
                                     </td>
-                                    <td><span class="time-cell">@c.CreatedAt.ToString("MMM dd, yyyy")</span></td>
                                 </tr>
                             }
                         </tbody>

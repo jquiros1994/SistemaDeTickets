@@ -1,0 +1,473 @@
+@using System.Linq
+@using Newtonsoft.Json
+@{
+    Layout = null;
+    ViewBag.Title = "Reports";
+
+    string statusLabels    = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.StatusCount>)ViewBag.StatusCounts).Select(s => s.StatusName));
+    string statusData      = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.StatusCount>)ViewBag.StatusCounts).Select(s => s.Count));
+
+    string priorityLabels  = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.PriorityCount>)ViewBag.PriorityCounts).Select(p => p.PriorityName));
+    string priorityData    = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.PriorityCount>)ViewBag.PriorityCounts).Select(p => p.Count));
+
+    string trendLabels     = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.DailyResolvedCount>)ViewBag.ResolvedTrend).Select(d => d.Date.ToString("MMM d")));
+    string trendData       = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.DailyResolvedCount>)ViewBag.ResolvedTrend).Select(d => d.Count));
+
+    string workloadLabels  = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.EngineerWorkload>)ViewBag.EngineerWorkload).Select(e => e.EngineerName));
+    string workloadOpen    = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.EngineerWorkload>)ViewBag.EngineerWorkload).Select(e => e.OpenCases));
+    string workloadTotal   = JsonConvert.SerializeObject(((IEnumerable<ITSupport.Models.EngineerWorkload>)ViewBag.EngineerWorkload).Select(e => e.TotalCases));
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT Support — Reports</title>
+    @Styles.Render("~/Content/css")
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0f3460 0%, #533483 100%);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .sidebar-brand span {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            vertical-align: middle;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            list-style: none;
+        }
+
+        .nav-section-label {
+            padding: 0.75rem 1.25rem 0.35rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 1.25rem;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-left-color: #e94560;
+        }
+
+        .sidebar-nav a .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .user-avatar {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .user-info { flex: 1; overflow: hidden; }
+        .user-name  { font-size: 0.83rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-role  { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
+
+        .btn-signout {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px;
+            transition: color 0.2s;
+        }
+        .btn-signout:hover { color: #e94560; }
+
+        /* ── MAIN ── */
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: #fff;
+            padding: 0 1.75rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .topbar-title h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .topbar-title p {
+            font-size: 0.78rem;
+            color: #999;
+            margin-top: 1px;
+        }
+
+        /* ── PAGE BODY ── */
+        .page-body { padding: 1.75rem; flex: 1; }
+
+        /* ── REPORT GRID ── */
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.1rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .report-grid.full { grid-template-columns: 1fr; }
+
+        .section-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.1rem 1.4rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .section-header h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .section-header p {
+            font-size: 0.78rem;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .chart-body { padding: 1.1rem 1.4rem 1.4rem; }
+        .chart-body canvas { max-height: 260px; }
+
+        /* ── SLA TABLE ── */
+        .sla-table { width: 100%; border-collapse: collapse; }
+
+        .sla-table thead th {
+            padding: 0.7rem 1.4rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #aaa;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: left;
+        }
+
+        .sla-table tbody td {
+            padding: 0.85rem 1.4rem;
+            font-size: 0.85rem;
+            color: #444;
+            border-bottom: 1px solid #f8f8f8;
+        }
+        .sla-table tbody tr:last-child td { border-bottom: none; }
+
+        .compliance-bar-track {
+            background: #f0f0f0;
+            border-radius: 20px;
+            height: 8px;
+            width: 140px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        .compliance-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: #28a745;
+        }
+        .compliance-bar-fill.warn { background: #f57f17; }
+        .compliance-bar-fill.bad  { background: #e94560; }
+    </style>
+</head>
+<body>
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">&#128187;</div>
+            <span>IT Support</span>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="nav-section-label">Main Menu</li>
+            <li>
+                <a href="@Url.Action("Index","Dashboard")">
+                    <span class="nav-icon">&#9636;</span> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Index","Cases")">
+                    <span class="nav-icon">&#128203;</span> All Cases
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Create","Cases")">
+                    <span class="nav-icon">&#43;</span> New Case
+                </a>
+            </li>
+
+            <li class="nav-section-label" style="margin-top:0.5rem;">Management</li>
+            <li>
+                <a href="@Url.Action("Index","Customers")">
+                    <span class="nav-icon">&#128100;</span> Customers
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Index","Engineers")">
+                    <span class="nav-icon">&#128736;</span> Engineers
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Index","Reports")" class="active">
+                    <span class="nav-icon">&#128202;</span> Reports
+                </a>
+            </li>
+
+            <li class="nav-section-label" style="margin-top:0.5rem;">Settings</li>
+            <li>
+                <a href="@Url.Action("Index","Configuration")">
+                    <span class="nav-icon">&#9881;</span> Configuration
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="user-avatar">&#128100;</div>
+                <div class="user-info">
+                    <div class="user-name">@ViewBag.Username</div>
+                    <div class="user-role">@ViewBag.Role</div>
+                </div>
+                <a href="@Url.Action("SignOut", "Dashboard")" class="btn-signout" title="Sign out">&#8594;</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <div class="main-content">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h2>Reports</h2>
+                <p>Case activity, workload and SLA performance</p>
+            </div>
+        </header>
+
+        <!-- Page Body -->
+        <div class="page-body">
+
+            <div class="report-grid">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3>Cases by Status</h3>
+                        <p>Current distribution across all cases</p>
+                    </div>
+                    <div class="chart-body"><canvas id="statusChart"></canvas></div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3>Cases by Priority</h3>
+                        <p>Current distribution across all cases</p>
+                    </div>
+                    <div class="chart-body"><canvas id="priorityChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="report-grid full">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3>Resolved Cases — Last 14 Days</h3>
+                        <p>Number of cases closed per day</p>
+                    </div>
+                    <div class="chart-body"><canvas id="trendChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="report-grid">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3>Engineer Workload</h3>
+                        <p>Open vs. total assigned cases per engineer</p>
+                    </div>
+                    <div class="chart-body"><canvas id="workloadChart"></canvas></div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3>SLA Compliance</h3>
+                        <p>Closed cases resolved within their priority's SLA window</p>
+                    </div>
+                    <table class="sla-table">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>SLA</th>
+                                <th>Closed</th>
+                                <th>Compliance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (ITSupport.Models.SlaCompliance s in ViewBag.SlaCompliance)
+                            {
+                                string barClass = s.CompliancePercent >= 90 ? "" : (s.CompliancePercent >= 70 ? "warn" : "bad");
+                                <tr>
+                                    <td>@s.PriorityName</td>
+                                    <td>@s.SlaHours h</td>
+                                    <td>@s.TotalClosed</td>
+                                    <td>
+                                        <span class="compliance-bar-track">
+                                            <span class="compliance-bar-fill @barClass" style="width:@s.CompliancePercent.ToString("0")%;"></span>
+                                        </span>
+                                        @s.CompliancePercent.ToString("0.0")%
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        const palette = ['#0f3460', '#533483', '#e94560', '#28a745', '#f57f17', '#1565c0'];
+
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(statusLabels),
+                datasets: [{ data: @Html.Raw(statusData), backgroundColor: palette }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('priorityChart'), {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(priorityLabels),
+                datasets: [{ data: @Html.Raw(priorityData), backgroundColor: palette }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(trendLabels),
+                datasets: [{
+                    label: 'Resolved cases',
+                    data: @Html.Raw(trendData),
+                    borderColor: '#0f3460',
+                    backgroundColor: 'rgba(15,52,96,0.08)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        new Chart(document.getElementById('workloadChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(workloadLabels),
+                datasets: [
+                    { label: 'Open', data: @Html.Raw(workloadOpen), backgroundColor: '#e94560' },
+                    { label: 'Total', data: @Html.Raw(workloadTotal), backgroundColor: '#0f3460' }
+                ]
+            },
+            options: { plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+    </script>
+</body>
+</html>

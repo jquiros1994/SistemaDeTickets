@@ -1,12 +1,7 @@
-@model ITSupport.Models.Case
+@model ITSupport.Models.User
 @{
     Layout = null;
-    ViewBag.Title = "Edit Case";
-    var statuses = ViewBag.Statuses as List<ITSupport.Models.CaseStatus>;
-    var priorities = ViewBag.Priorities as List<ITSupport.Models.Priority>;
-    var contacts = ViewBag.Contacts as List<ITSupport.Models.Contact>;
-    var engineers = ViewBag.Engineers as List<ITSupport.Models.SupportEngineer>;
-    var programs = ViewBag.Programs as List<ITSupport.Models.SupportProgram>;
+    ViewBag.Title = "Configuration";
     var errors = ViewBag.Errors as List<string>;
 }
 
@@ -15,7 +10,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IT Support — Edit Case</title>
+    <title>IT Support — Configuration</title>
     @Styles.Render("~/Content/css")
     <style>
         *, *::before, *::after {
@@ -182,30 +177,11 @@
             height: 64px;
             display: flex;
             align-items: center;
-            gap: 1rem;
             box-shadow: 0 1px 4px rgba(0,0,0,.08);
             position: sticky;
             top: 0;
             z-index: 90;
         }
-
-        .btn-back {
-            background: #f0f2f5;
-            border: none;
-            border-radius: 8px;
-            padding: .4rem .85rem;
-            font-size: .82rem;
-            font-weight: 600;
-            color: #555;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background .2s;
-        }
-
-            .btn-back:hover {
-                background: #e4e6ea;
-                color: #333;
-            }
 
         .topbar-title h2 {
             font-size: 1.1rem;
@@ -225,6 +201,20 @@
         }
 
         /* Alerts */
+        .alert {
+            border-radius: 10px;
+            padding: .75rem 1.1rem;
+            margin-bottom: 1.1rem;
+            font-size: .85rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #e6f9f1;
+            border: 1px solid #bfe8d4;
+            color: #1b5e20;
+        }
+
         .alert-error {
             background: #fde8ec;
             border: 1px solid #f5c2cb;
@@ -238,6 +228,44 @@
             .alert-error ul {
                 margin: .25rem 0 0 1.1rem;
             }
+
+        /* Overview card */
+        .overview-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.1rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .overview-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#0f3460,#533483);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .overview-username {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .overview-password {
+            font-size: .85rem;
+            color: #999;
+            margin-top: 2px;
+            letter-spacing: 2px;
+        }
 
         /* Form card */
         .form-card {
@@ -256,6 +284,12 @@
                 font-size: .95rem;
                 font-weight: 700;
                 color: #1a1a2e;
+            }
+
+            .form-card-header p {
+                font-size: .78rem;
+                color: #999;
+                margin-top: 2px;
             }
 
         .form-card-body {
@@ -306,17 +340,14 @@
                 box-shadow: 0 0 0 3px rgba(15,52,96,.1);
             }
 
-        textarea.form-control {
-            resize: vertical;
-            min-height: 110px;
+        .form-hint {
+            font-size: .76rem;
+            color: #aaa;
         }
 
-        select.form-control {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23999' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right .85rem center;
-            padding-right: 2rem;
+        .form-divider {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 1.1rem;
         }
 
         .form-footer {
@@ -325,25 +356,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: .75rem;
         }
-
-        .btn-cancel {
-            background: #f0f2f5;
-            border: none;
-            border-radius: 8px;
-            padding: .5rem 1.1rem;
-            font-size: .88rem;
-            font-weight: 600;
-            color: #555;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background .2s;
-        }
-
-            .btn-cancel:hover {
-                background: #e4e6ea;
-            }
 
         .btn-submit {
             background: linear-gradient(135deg,#0f3460,#533483);
@@ -373,14 +386,14 @@
         <ul class="sidebar-nav">
             <li class="nav-section-label">Main Menu</li>
             <li><a href="@Url.Action("Index","Dashboard")"><span class="nav-icon">&#9636;</span> Dashboard</a></li>
-            <li><a href="@Url.Action("Index","Cases")" class="active"><span class="nav-icon">&#128203;</span> All Cases</a></li>
+            <li><a href="@Url.Action("Index","Cases")"><span class="nav-icon">&#128203;</span> All Cases</a></li>
             <li><a href="@Url.Action("Create","Cases")"><span class="nav-icon">&#43;</span> New Case</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Management</li>
             <li><a href="@Url.Action("Index","Customers")"><span class="nav-icon">&#128100;</span> Customers</a></li>
             <li><a href="@Url.Action("Index","Engineers")"><span class="nav-icon">&#128736;</span> Engineers</a></li>
-            <li><a href="#"><span class="nav-icon">&#128202;</span> Reports</a></li>
+            <li><a href="@Url.Action("Index","Reports")"><span class="nav-icon">&#128202;</span> Reports</a></li>
             <li class="nav-section-label" style="margin-top:.5rem">Settings</li>
-            <li><a href="@Url.Action("Index","Configuration")"><span class="nav-icon">&#9881;</span> Configuration</a></li>
+            <li><a href="@Url.Action("Index","Configuration")" class="active"><span class="nav-icon">&#9881;</span> Configuration</a></li>
         </ul>
         <div class="sidebar-footer">
             <div class="user-pill">
@@ -397,14 +410,18 @@
     <!-- Main -->
     <div class="main-content">
         <header class="topbar">
-            <a href="@Url.Action("Index","Cases")" class="btn-back">&#8592; Back</a>
             <div class="topbar-title">
-                <h2>Edit Case @Model.CaseNumber</h2>
-                <p>Update the details of this support case</p>
+                <h2>Configuration</h2>
+                <p>Manage your account details</p>
             </div>
         </header>
 
         <div class="page-body">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">&#10003; @TempData["Success"]</div>
+            }
 
             @if (errors != null && errors.Count > 0)
             {
@@ -414,116 +431,59 @@
                         @foreach (var e in errors)
                         {
                             <li>@e</li>
-}
+                        }
                     </ul>
                 </div>
             }
 
-            @using (Html.BeginForm("Edit", "Cases", FormMethod.Post))
+            <!-- Account overview -->
+            <div class="overview-card">
+                <div class="overview-avatar">&#128100;</div>
+                <div>
+                    <div class="overview-username">@Model.Username</div>
+                    <div class="overview-password">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</div>
+                </div>
+            </div>
+
+            <!-- Update form -->
+            @using (Html.BeginForm("Index", "Configuration", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                @Html.HiddenFor(m => m.CaseId)
-                @Html.HiddenFor(m => m.CreatedByUserId)
 
                 <div class="form-card">
                     <div class="form-card-header">
-                        <h3>Case Information</h3>
+                        <h3>Account Settings</h3>
+                        <p>Update your name, email, or password</p>
                     </div>
                     <div class="form-card-body">
 
-                        <div class="form-group full">
-                            <label>Title *</label>
-                            <input type="text" name="Title" class="form-control" value="@Model.Title" required />
-                        </div>
-
-                        <div class="form-group full">
-                            <label>Description *</label>
-                            <textarea name="Description" class="form-control" required>@Model.Description</textarea>
-                        </div>
-
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Status *</label>
-                                <select name="StatusId" class="form-control" required>
-                                    @if (statuses != null)
-                                    {
-                                        foreach (var s in statuses)
-                                        {
-                                            <option value="@s.StatusId" @(Model.StatusId == s.StatusId ? "selected" : "")>@s.StatusName</option>
-                                        }
-                                    }
-                                </select>
+                                <label>Name *</label>
+                                <input type="text" name="username" class="form-control" value="@Model.Username" required />
                             </div>
                             <div class="form-group">
-                                <label>Priority *</label>
-                                <select name="PriorityId" class="form-control" required>
-                                    <option value="">— Select priority —</option>
-                                    @if (priorities != null)
-                                    {
-                                        foreach (var p in priorities)
-                                        {
-                                            <option value="@p.PriorityId" @(Model.PriorityId == p.PriorityId ? "selected" : "")>@p.PriorityName (SLA @p.SlaHours h)</option>
-                                        }
-                                    }
-                                </select>
+                                <label>Email *</label>
+                                <input type="email" name="email" class="form-control" value="@Model.Email" required />
+                            </div>
+                        </div>
+
+                        <div class="form-row form-divider">
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" name="newPassword" class="form-control" placeholder="Leave blank to keep current password" />
                             </div>
                             <div class="form-group">
-                                <label>Contact *</label>
-                                <select name="ContactId" class="form-control" required>
-                                    <option value="">— Select contact —</option>
-                                    @if (contacts != null)
-                                    {
-                                        foreach (var c in contacts)
-                                        {
-                                            <option value="@c.ContactId" @(Model.ContactId == c.ContactId ? "selected" : "")>@c.ContactName</option>
-                                        }
-                                    }
-                                </select>
+                                <label>Confirm New Password</label>
+                                <input type="password" name="confirmPassword" class="form-control" placeholder="Re-enter new password" />
                             </div>
-                            <div class="form-group">
-                                <label>Program *</label>
-                                <select name="ProgramId" class="form-control" required>
-                                    <option value="">— Select program —</option>
-                                    @if (programs != null)
-                                    {
-                                        foreach (var p in programs)
-                                        {
-                                            <option value="@p.ProgramId" @(Model.ProgramId == p.ProgramId ? "selected" : "")>@p.ProgramName</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Assigned Engineer</label>
-                                <select name="OwnerId" class="form-control">
-                                    <option value="">— Unassigned —</option>
-                                    @if (engineers != null)
-                                    {
-                                        foreach (var e in engineers)
-                                        {
-                                            <option value="@e.EngineerId" @(Model.OwnerId == e.EngineerId ? "selected" : "")>@e.Name</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Country *</label>
-                                <input type="text" name="Country" class="form-control" value="@Model.Country" required />
-                            </div>
-                            <div class="form-group">
-                                <label>Preferred Contact</label>
-                                <select name="PreferredContact" class="form-control">
-                                    <option value="">— Select —</option>
-                                    <option value="Email" @(Model.PreferredContact == "Email" ? "selected" : "")>Email</option>
-                                    <option value="Phone" @(Model.PreferredContact == "Phone" ? "selected" : "")>Phone</option>
-                                    <option value="Portal" @(Model.PreferredContact == "Portal" ? "selected" : "")>Portal</option>
-                                </select>
+                            <div class="form-group full">
+                                <span class="form-hint">Password must be at least 8 characters. Leave both fields blank to keep your current password.</span>
                             </div>
                         </div>
 
                     </div>
                     <div class="form-footer">
-                        <a href="@Url.Action("Index","Cases")" class="btn-cancel">Cancel</a>
                         <button type="submit" class="btn-submit">Save Changes</button>
                     </div>
                 </div>

@@ -8,12 +8,13 @@ namespace ITSupport.Models
         public string PhoneNumber { get; set; }
         public int LevelId { get; set; }
         public int ScheduleId { get; set; }
+        public string JobTitle { get; set; }
         public bool IsActive { get; set; }
 
         public SupportEngineer() { }
 
         public SupportEngineer(int engineerId, string name, string email, string phoneNumber,
-                               int levelId, int scheduleId, bool isActive)
+                               int levelId, int scheduleId, string jobTitle, bool isActive)
         {
             EngineerId = engineerId;
             Name = name;
@@ -21,6 +22,7 @@ namespace ITSupport.Models
             PhoneNumber = phoneNumber;
             LevelId = levelId;
             ScheduleId = scheduleId;
+            JobTitle = jobTitle;
             IsActive = isActive;
         }
     }

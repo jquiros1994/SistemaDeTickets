@@ -399,7 +399,7 @@
         <ul class="sidebar-nav">
             <li class="nav-section-label">Main Menu</li>
             <li>
-                <a href="#" class="active">
+                <a href="@Url.Action("Index","Dashboard")" class="active">
                     <span class="nav-icon">&#9636;</span> Dashboard
                 </a>
             </li>
@@ -421,19 +421,19 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="@Url.Action("Index","Engineers")">
                     <span class="nav-icon">&#128736;</span> Engineers
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="@Url.Action("Index","Reports")">
                     <span class="nav-icon">&#128202;</span> Reports
                 </a>
             </li>
 
             <li class="nav-section-label" style="margin-top:0.5rem;">Settings</li>
             <li>
-                <a href="#">
+                <a href="@Url.Action("Index","Configuration")">
                     <span class="nav-icon">&#9881;</span> Configuration
                 </a>
             </li>

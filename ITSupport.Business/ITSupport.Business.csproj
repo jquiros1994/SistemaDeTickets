@@ -63,8 +63,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CaseBusiness.cs" />
+    <Compile Include="ConfigurationBusiness.cs" />
     <Compile Include="CustomerBusiness.cs" />
     <Compile Include="DashboardBusiness.cs" />
+    <Compile Include="EngineerBusiness.cs" />
+    <Compile Include="ReportsBusiness.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
