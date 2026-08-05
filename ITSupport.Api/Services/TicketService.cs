@@ -16,17 +16,25 @@ namespace ITSupport.TicketReceiver.Services
             // Registramos los observers
             Attach(new EmailObserver());
         }
-
+        /// <summary>
+        /// Registers a new observer that will receive notifications
+        /// after a ticket is created.
+        /// </summary>
         public void Attach(ITicketObserver observer)
         {
             _observers.Add(observer);
         }
-
+        /// <summary>
+        /// Removes an observer from the notification list.
+        /// </summary>
         public void Detach(ITicketObserver observer)
         {
             _observers.Remove(observer);
         }
-
+        /// <summary>
+        /// Notifies all registered observers that a ticket
+        /// has been created successfully.
+        /// </summary>
         private void Notify(CreateTicketResponse response)
         {
             foreach (ITicketObserver observer in _observers)
@@ -34,7 +42,11 @@ namespace ITSupport.TicketReceiver.Services
                 observer.Update(response);
             }
         }
-
+        /// <summary>
+        /// Creates a new support ticket using the business layer.
+        /// If the operation succeeds, all registered observers
+        /// are notified.
+        /// </summary>
         public CreateTicketResponse CreateTicket(CreateTicketRequest request)
         {
             CaseBusiness business = new CaseBusiness();
