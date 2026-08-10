@@ -164,6 +164,8 @@
     <Compile Include="Observers\EmailObserver.cs" />
     <Compile Include="Observers\ITicketObserver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IEmailService.cs" />
+    <Compile Include="Services\SmtpEmailService.cs" />
     <Compile Include="Services\TicketService.cs" />
   </ItemGroup>
   <ItemGroup>

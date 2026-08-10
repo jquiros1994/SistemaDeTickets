@@ -1,22 +1,28 @@
-﻿using System.Diagnostics;
-using ITSupport.TicketReceiver.DTOs;
+﻿using ITSupport.TicketReceiver.DTOs;
+using ITSupport.TicketReceiver.Services;
 
 namespace ITSupport.TicketReceiver.Observers
 {
-    /// <summary>
-    /// concrete Observer
-    /// Receives notifications from the TicketService after a ticket
-    /// has been created successufully.
-    /// 
-    /// For now just writes a message to confirm the process
-    /// </summary>
+    // DP: Observer - Concrete Observer
+    // Reacts when a ticket is created successfully
+    // by requesting an email notification.
     public class EmailObserver : ITicketObserver
     {
-        public void Update(CreateTicketResponse response)
+        private readonly IEmailService _emailService;
+
+        public EmailObserver()
         {
-            Debug.WriteLine(
-                $"[EMAIL] Ticket #{response.TicketId} creado correctamente. Enviando correo...");
+            _emailService = new SmtpEmailService();
         }
 
+        public void Update(CreateTicketResponse response)
+        {
+            if (response == null || !response.Success)
+            {
+                return;
+            }
+
+            _emailService.SendTicketCreatedEmail(response.TicketId);
+        }
     }
 }
