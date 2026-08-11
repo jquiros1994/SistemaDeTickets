@@ -14,7 +14,7 @@ namespace ITSupport.DAL
 			var list = new List<SupportEngineer>();
 			using (var conn = DatabaseHelper.GetConnection())
 			using (var cmd = new SqlCommand(
-				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, IsActive FROM SupportEngineers", conn))
+				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, JobTitle, IsActive FROM SupportEngineers", conn))
 			{
 				conn.Open();
 				using (var reader = cmd.ExecuteReader())
@@ -28,7 +28,7 @@ namespace ITSupport.DAL
 		{
 			using (var conn = DatabaseHelper.GetConnection())
 			using (var cmd = new SqlCommand(
-				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, IsActive FROM SupportEngineers WHERE EngineerId = @EngineerId", conn))
+				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, JobTitle, IsActive FROM SupportEngineers WHERE EngineerId = @EngineerId", conn))
 			{
 				cmd.Parameters.AddWithValue("@EngineerId", engineerId);
 				conn.Open();
@@ -41,7 +41,7 @@ namespace ITSupport.DAL
 		{
 			using (var conn = DatabaseHelper.GetConnection())
 			using (var cmd = new SqlCommand(
-				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, IsActive FROM SupportEngineers WHERE Email = @Email", conn))
+				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, JobTitle, IsActive FROM SupportEngineers WHERE Email = @Email", conn))
 			{
 				cmd.Parameters.AddWithValue("@Email", email);
 				conn.Open();
@@ -53,9 +53,9 @@ namespace ITSupport.DAL
 		public int Insert(SupportEngineer engineer)
 		{
 			const string sql = @"
-                INSERT INTO SupportEngineers (Name, Email, PhoneNumber, LevelId, ScheduleId, IsActive)
+                INSERT INTO SupportEngineers (Name, Email, PhoneNumber, LevelId, ScheduleId, JobTitle, IsActive)
                 OUTPUT INSERTED.EngineerId
-                VALUES (@Name, @Email, @PhoneNumber, @LevelId, @ScheduleId, @IsActive)";
+                VALUES (@Name, @Email, @PhoneNumber, @LevelId, @ScheduleId, @JobTitle, @IsActive)";
 
 			using (var conn = DatabaseHelper.GetConnection())
 			using (var cmd = new SqlCommand(sql, conn))
@@ -65,6 +65,7 @@ namespace ITSupport.DAL
 				cmd.Parameters.AddWithValue("@PhoneNumber", (object)engineer.PhoneNumber ?? DBNull.Value);
 				cmd.Parameters.AddWithValue("@LevelId", engineer.LevelId);
 				cmd.Parameters.AddWithValue("@ScheduleId", engineer.ScheduleId);
+				cmd.Parameters.AddWithValue("@JobTitle", engineer.JobTitle);
 				cmd.Parameters.AddWithValue("@IsActive", engineer.IsActive);
 				conn.Open();
 				return (int)cmd.ExecuteScalar();
@@ -76,7 +77,7 @@ namespace ITSupport.DAL
 			const string sql = @"
                 UPDATE SupportEngineers
                 SET Name = @Name, Email = @Email, PhoneNumber = @PhoneNumber,
-                    LevelId = @LevelId, ScheduleId = @ScheduleId, IsActive = @IsActive
+                    LevelId = @LevelId, ScheduleId = @ScheduleId, JobTitle = @JobTitle, IsActive = @IsActive
                 WHERE EngineerId = @EngineerId";
 
 			using (var conn = DatabaseHelper.GetConnection())
@@ -88,6 +89,7 @@ namespace ITSupport.DAL
 				cmd.Parameters.AddWithValue("@PhoneNumber", (object)engineer.PhoneNumber ?? DBNull.Value);
 				cmd.Parameters.AddWithValue("@LevelId", engineer.LevelId);
 				cmd.Parameters.AddWithValue("@ScheduleId", engineer.ScheduleId);
+				cmd.Parameters.AddWithValue("@JobTitle", engineer.JobTitle);
 				cmd.Parameters.AddWithValue("@IsActive", engineer.IsActive);
 				conn.Open();
 				return cmd.ExecuteNonQuery() > 0;
@@ -105,6 +107,40 @@ namespace ITSupport.DAL
 			}
 		}
 
+		public List<EngineerViewModel> GetAllWithLevel()
+		{
+			var list = new List<EngineerViewModel>();
+			const string sql = @"
+                SELECT se.EngineerId, se.Name, se.Email, se.PhoneNumber, se.JobTitle, se.IsActive,
+                       el.LevelName
+                FROM   SupportEngineers se
+                JOIN   EngineerLevels   el ON el.LevelId = se.LevelId
+                ORDER BY se.Name";
+
+			using (var conn = DatabaseHelper.GetConnection())
+			using (var cmd = new SqlCommand(sql, conn))
+			{
+				conn.Open();
+				using (var reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						list.Add(new EngineerViewModel
+						{
+							EngineerId = (int)reader["EngineerId"],
+							Name = (string)reader["Name"],
+							Email = (string)reader["Email"],
+							PhoneNumber = reader["PhoneNumber"] as string,
+							JobTitle = (string)reader["JobTitle"],
+							LevelName = (string)reader["LevelName"],
+							IsActive = (bool)reader["IsActive"]
+						});
+					}
+				}
+			}
+			return list;
+		}
+
 		private SupportEngineer Map(SqlDataReader r) => new SupportEngineer(
 			r.GetInt32(r.GetOrdinal("EngineerId")),
 			r.GetString(r.GetOrdinal("Name")),
@@ -112,6 +148,7 @@ namespace ITSupport.DAL
 			r.IsDBNull(r.GetOrdinal("PhoneNumber")) ? null : r.GetString(r.GetOrdinal("PhoneNumber")),
 			r.GetInt32(r.GetOrdinal("LevelId")),
 			r.GetInt32(r.GetOrdinal("ScheduleId")),
+			r.GetString(r.GetOrdinal("JobTitle")),
 			r.GetBoolean(r.GetOrdinal("IsActive"))
 		);
 	}
