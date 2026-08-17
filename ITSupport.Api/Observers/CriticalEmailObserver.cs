@@ -21,7 +21,7 @@ namespace ITSupport.TicketReceiver.Observers
                 return;
             }
 
-            if (response.Severity != "Critical")
+            if (response.PriorityId != 1)
             {
                 return;
             }

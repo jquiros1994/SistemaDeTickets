@@ -9,11 +9,12 @@ namespace ITSupport.TicketReceiver.Services
 {
     public class TicketService
     {
-        private readonly List<ITicketObserver> _observers = new List<ITicketObserver>();
+        private readonly List<ITicketObserver> _observers =
+            new List<ITicketObserver>();
 
         public TicketService()
         {
-            // Register observers
+            // Observers que reaccionan cuando se crea un ticket
             Attach(new EmailObserver());
             Attach(new CriticalEmailObserver());
         }
@@ -59,6 +60,7 @@ namespace ITSupport.TicketReceiver.Services
             CaseCreationResult result = business.CreateExternalCase(
                 request.Title,
                 request.Description,
+                request.Application,
                 request.PriorityId,
                 request.ContactId,
                 request.ProgramId,
@@ -71,10 +73,13 @@ namespace ITSupport.TicketReceiver.Services
                 Success = result.Success,
                 Message = result.Message,
                 TicketId = result.CaseId,
-                Severity = request.Severity
+
+                // Se conserva la prioridad para que los observers
+                // puedan determinar si el ticket es crítico.
+                PriorityId = request.PriorityId
             };
 
-            // Notify observers only if the ticket was created successfully
+            // Solo notificamos si el ticket se creó correctamente
             if (response.Success)
             {
                 Notify(response);

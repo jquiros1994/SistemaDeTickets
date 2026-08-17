@@ -71,19 +71,22 @@ namespace ITSupport.Business
 			return OperationResult.Ok(newId);
 		}
 
-		//This method helps to create model object from ITSupport.TicketReceiver 
-		public CaseCreationResult CreateExternalCase(string title, string description, int priorityId, int contactId, int programId, string country, int createdByUserId, string preferredContact)
-		{
-			Case model = new Case { Title = title, Description = description, PriorityId = priorityId, ContactId = contactId, ProgramId = programId, Country = country, CreatedByUserId = createdByUserId,PreferredContact = preferredContact};
-			OperationResult result = Create(model);
-			return new CaseCreationResult
-			{
-				Success = result.Success,
-				Message = result.Success ? "Case created successfully." : string.Join(", ", result.Errors), CaseId = result.Success ? result.RecordId: 0
-			};
-		}
+        //This method helps to create model object from ITSupport.TicketReceiver 
+        public CaseCreationResult CreateExternalCase(string title, string description, string application, int priorityId, int contactId, int programId, string country, int createdByUserId, string preferredContact)
+        {
+            Case model = new Case {Title = title, Description = description, Application = application, PriorityId = priorityId, ContactId = contactId, ProgramId = programId, Country = country, CreatedByUserId = createdByUserId, PreferredContact = preferredContact};
+            OperationResult result = Create(model);
+            return new CaseCreationResult
+            {
+                Success = result.Success,
+                Message = result.Success
+                    ? "Case created successfully."
+                    : string.Join(", ", result.Errors),
+                CaseId = result.Success ? result.RecordId : 0
+            };
+        }
 
-		public OperationResult Update(Case model)
+        public OperationResult Update(Case model)
 		{
 			var errors = Validate(model);
 			if (errors.Count > 0)

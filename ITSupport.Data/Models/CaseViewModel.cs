@@ -8,6 +8,7 @@ namespace ITSupport.Models
         public string  CaseNumber       { get; set; }
         public string  Title            { get; set; }
         public string  Description      { get; set; }
+        public string Application       { get; set; }
         public string  StatusName       { get; set; }
         public bool    IsOpen           { get; set; }
         public string  PriorityName     { get; set; }

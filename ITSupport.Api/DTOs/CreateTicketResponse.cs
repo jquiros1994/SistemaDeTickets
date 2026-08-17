@@ -9,5 +9,6 @@
         public int TicketId { get; set; }
 
         public string Severity { get; set; }
+        public int PriorityId { get; set; }
     }
 }
