@@ -10,12 +10,12 @@ namespace ITSupport.DAL
 	// SOLID: DIP - implementa ICaseRepository 
 	public class CaseRepository : ICaseRepository
 	{
-		private const string SelectColumns = @"
-            CaseId, CaseNumber, StatusId, PriorityId, Title, Description,
-            ContactId, ProgramId, Country, OwnerId, CreatedByUserId,
-            PreferredContact, CreatedAt, UpdatedAt, ClosedAt";
+        private const string SelectColumns = @"
+			CaseId, CaseNumber, StatusId, PriorityId, Title, Description,
+			Application, ContactId, ProgramId, Country, OwnerId, CreatedByUserId,
+			PreferredContact, CreatedAt, UpdatedAt, ClosedAt";
 
-		public List<Case> GetAll()
+        public List<Case> GetAll()
 		{
 			var list = new List<Case>();
 			using (var conn = DatabaseHelper.GetConnection())
@@ -95,58 +95,64 @@ namespace ITSupport.DAL
 			return list;
 		}
 
-		public ITSupport.Models.CaseViewModel GetByIdWithDetails(int caseId)
-		{
-			const string sql = @"
-                SELECT c.CaseId, c.CaseNumber, c.Title, c.Description,
-                       cs.StatusName, cs.IsOpen,
-                       p.PriorityName, p.SlaHours,
-                       ct.ContactName, ct.ContactEmail,
-                       se.Name AS OwnerName,
-                       pr.ProgramName,
-                       c.Country, c.PreferredContact,
-                       c.CreatedAt, c.UpdatedAt, c.ClosedAt
-                FROM   Cases c
-                JOIN   CaseStatuses      cs ON cs.StatusId   = c.StatusId
-                JOIN   Priorities        p  ON p.PriorityId  = c.PriorityId
-                JOIN   Contacts          ct ON ct.ContactId  = c.ContactId
-                JOIN   Programs          pr ON pr.ProgramId  = c.ProgramId
-                LEFT JOIN SupportEngineers se ON se.EngineerId = c.OwnerId
-                WHERE  c.CaseId = @CaseId";
+        public ITSupport.Models.CaseViewModel GetByIdWithDetails(int caseId)
+        {
+            const string sql = @"
+        SELECT c.CaseId, c.CaseNumber, c.Title, c.Description,
+               c.Application,
+               cs.StatusName, cs.IsOpen,
+               p.PriorityName, p.SlaHours,
+               ct.ContactName, ct.ContactEmail,
+               se.Name AS OwnerName,
+               pr.ProgramName,
+               c.Country, c.PreferredContact,
+               c.CreatedAt, c.UpdatedAt, c.ClosedAt
+        FROM   Cases c
+        JOIN   CaseStatuses      cs ON cs.StatusId   = c.StatusId
+        JOIN   Priorities        p  ON p.PriorityId  = c.PriorityId
+        JOIN   Contacts          ct ON ct.ContactId  = c.ContactId
+        JOIN   Programs          pr ON pr.ProgramId  = c.ProgramId
+        LEFT JOIN SupportEngineers se ON se.EngineerId = c.OwnerId
+        WHERE  c.CaseId = @CaseId";
 
-			using (var conn = DatabaseHelper.GetConnection())
-			using (var cmd = new SqlCommand(sql, conn))
-			{
-				cmd.Parameters.AddWithValue("@CaseId", caseId);
-				conn.Open();
-				using (var r = cmd.ExecuteReader())
-				{
-					if (!r.Read()) return null;
-					return new ITSupport.Models.CaseViewModel
-					{
-						CaseId = r.GetInt32(r.GetOrdinal("CaseId")),
-						CaseNumber = r.IsDBNull(r.GetOrdinal("CaseNumber")) ? null : r.GetString(r.GetOrdinal("CaseNumber")),
-						Title = r.GetString(r.GetOrdinal("Title")),
-						Description = r.GetString(r.GetOrdinal("Description")),
-						StatusName = r.GetString(r.GetOrdinal("StatusName")),
-						IsOpen = r.GetBoolean(r.GetOrdinal("IsOpen")),
-						PriorityName = r.GetString(r.GetOrdinal("PriorityName")),
-						SlaHours = r.GetInt32(r.GetOrdinal("SlaHours")),
-						ContactName = r.GetString(r.GetOrdinal("ContactName")),
-						ContactEmail = r.IsDBNull(r.GetOrdinal("ContactEmail")) ? null : r.GetString(r.GetOrdinal("ContactEmail")),
-						OwnerName = r.IsDBNull(r.GetOrdinal("OwnerName")) ? null : r.GetString(r.GetOrdinal("OwnerName")),
-						ProgramName = r.GetString(r.GetOrdinal("ProgramName")),
-						Country = r.GetString(r.GetOrdinal("Country")),
-						PreferredContact = r.IsDBNull(r.GetOrdinal("PreferredContact")) ? null : r.GetString(r.GetOrdinal("PreferredContact")),
-						CreatedAt = r.GetDateTime(r.GetOrdinal("CreatedAt")),
-						UpdatedAt = r.GetDateTime(r.GetOrdinal("UpdatedAt")),
-						ClosedAt = r.IsDBNull(r.GetOrdinal("ClosedAt")) ? (DateTime?)null : r.GetDateTime(r.GetOrdinal("ClosedAt")),
-					};
-				}
-			}
-		}
+            using (var conn = DatabaseHelper.GetConnection())
+            using (var cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@CaseId", caseId);
+                conn.Open();
 
-		public Case GetById(int caseId)
+                using (var r = cmd.ExecuteReader())
+                {
+                    if (!r.Read())
+                        return null;
+
+                    return new ITSupport.Models.CaseViewModel
+                    {
+                        CaseId = r.GetInt32(r.GetOrdinal("CaseId")),
+
+                        CaseNumber = r.IsDBNull(r.GetOrdinal("CaseNumber"))? null: r.GetString(r.GetOrdinal("CaseNumber")),
+                        Title = r.GetString(r.GetOrdinal("Title")),
+                        Description = r.GetString(r.GetOrdinal("Description")),
+                        Application = r.IsDBNull(r.GetOrdinal("Application"))? null: r.GetString(r.GetOrdinal("Application")),
+                        StatusName = r.GetString(r.GetOrdinal("StatusName")),
+                        IsOpen = r.GetBoolean(r.GetOrdinal("IsOpen")),
+                        PriorityName = r.GetString(r.GetOrdinal("PriorityName")),
+                        SlaHours = r.GetInt32(r.GetOrdinal("SlaHours")),
+                        ContactName = r.GetString(r.GetOrdinal("ContactName")),
+                        ContactEmail = r.IsDBNull(r.GetOrdinal("ContactEmail"))? null: r.GetString(r.GetOrdinal("ContactEmail")),
+                        OwnerName = r.IsDBNull(r.GetOrdinal("OwnerName"))? null: r.GetString(r.GetOrdinal("OwnerName")),
+                        ProgramName = r.GetString(r.GetOrdinal("ProgramName")),
+                        Country = r.GetString(r.GetOrdinal("Country")),
+                        PreferredContact = r.IsDBNull(r.GetOrdinal("PreferredContact"))? null: r.GetString(r.GetOrdinal("PreferredContact")),
+                        CreatedAt = r.GetDateTime(r.GetOrdinal("CreatedAt")),
+                        UpdatedAt = r.GetDateTime(r.GetOrdinal("UpdatedAt")),
+                        ClosedAt = r.IsDBNull(r.GetOrdinal("ClosedAt"))? (DateTime?)null: r.GetDateTime(r.GetOrdinal("ClosedAt"))
+                    };
+                }
+            }
+        }
+
+        public Case GetById(int caseId)
 		{
 			using (var conn = DatabaseHelper.GetConnection())
 			using (var cmd = new SqlCommand(
@@ -242,34 +248,44 @@ namespace ITSupport.DAL
         }
 
         public bool Update(Case c)
-		{
-			const string sql = @"
+        {
+            const string sql = @"
                 UPDATE Cases
-                SET StatusId = @StatusId, PriorityId = @PriorityId, Title = @Title,
-                    Description = @Description, ContactId = @ContactId, ProgramId = @ProgramId,
-                    Country = @Country, OwnerId = @OwnerId, PreferredContact = @PreferredContact,
+                SET StatusId = @StatusId,
+                    PriorityId = @PriorityId,
+                    Title = @Title,
+                    Description = @Description,
+                    Application = @Application,
+                    ContactId = @ContactId,
+                    ProgramId = @ProgramId,
+                    Country = @Country,
+                    OwnerId = @OwnerId,
+                    PreferredContact = @PreferredContact,
                     UpdatedAt = SYSUTCDATETIME()
                 WHERE CaseId = @CaseId";
 
-			using (var conn = DatabaseHelper.GetConnection())
-			using (var cmd = new SqlCommand(sql, conn))
-			{
-				cmd.Parameters.AddWithValue("@CaseId", c.CaseId);
-				cmd.Parameters.AddWithValue("@StatusId", c.StatusId);
-				cmd.Parameters.AddWithValue("@PriorityId", c.PriorityId);
-				cmd.Parameters.AddWithValue("@Title", c.Title);
-				cmd.Parameters.AddWithValue("@Description", c.Description);
-				cmd.Parameters.AddWithValue("@ContactId", c.ContactId);
-				cmd.Parameters.AddWithValue("@ProgramId", c.ProgramId);
-				cmd.Parameters.AddWithValue("@Country", c.Country);
-				cmd.Parameters.AddWithValue("@OwnerId", (object)c.OwnerId ?? DBNull.Value);
-				cmd.Parameters.AddWithValue("@PreferredContact", (object)c.PreferredContact ?? DBNull.Value);
-				conn.Open();
-				return cmd.ExecuteNonQuery() > 0;
-			}
-		}
+            using (var conn = DatabaseHelper.GetConnection())
+            using (var cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@CaseId", c.CaseId);
+                cmd.Parameters.AddWithValue("@StatusId", c.StatusId);
+                cmd.Parameters.AddWithValue("@PriorityId", c.PriorityId);
+                cmd.Parameters.AddWithValue("@Title", c.Title);
+                cmd.Parameters.AddWithValue("@Description", c.Description);
+                cmd.Parameters.AddWithValue("@Application",(object)c.Application ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@ContactId", c.ContactId);
+                cmd.Parameters.AddWithValue("@ProgramId", c.ProgramId);
+                cmd.Parameters.AddWithValue("@Country", c.Country);
+                cmd.Parameters.AddWithValue("@OwnerId",(object)c.OwnerId ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@PreferredContact",(object)c.PreferredContact ?? DBNull.Value);
 
-		public bool SetClosedAt(int caseId, DateTime? closedAt)
+                conn.Open();
+
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public bool SetClosedAt(int caseId, DateTime? closedAt)
 		{
 			const string sql = "UPDATE Cases SET ClosedAt = @ClosedAt WHERE CaseId = @CaseId";
 			using (var conn = DatabaseHelper.GetConnection())
@@ -293,22 +309,29 @@ namespace ITSupport.DAL
 			}
 		}
 
-		private Case Map(SqlDataReader r) => new Case(
-			r.GetInt32(r.GetOrdinal("CaseId")),
-			r.IsDBNull(r.GetOrdinal("CaseNumber")) ? null : r.GetString(r.GetOrdinal("CaseNumber")),
-			r.GetInt32(r.GetOrdinal("StatusId")),
-			r.GetInt32(r.GetOrdinal("PriorityId")),
-			r.GetString(r.GetOrdinal("Title")),
-			r.GetString(r.GetOrdinal("Description")),
-			r.GetInt32(r.GetOrdinal("ContactId")),
-			r.GetInt32(r.GetOrdinal("ProgramId")),
-			r.GetString(r.GetOrdinal("Country")),
-			r.IsDBNull(r.GetOrdinal("OwnerId")) ? (int?)null : r.GetInt32(r.GetOrdinal("OwnerId")),
-			r.GetInt32(r.GetOrdinal("CreatedByUserId")),
-			r.IsDBNull(r.GetOrdinal("PreferredContact")) ? null : r.GetString(r.GetOrdinal("PreferredContact")),
-			r.GetDateTime(r.GetOrdinal("CreatedAt")),
-			r.GetDateTime(r.GetOrdinal("UpdatedAt")),
-			r.IsDBNull(r.GetOrdinal("ClosedAt")) ? (DateTime?)null : r.GetDateTime(r.GetOrdinal("ClosedAt"))
-		);
-	}
+        private Case Map(SqlDataReader r)
+        {
+            var model = new Case(
+                r.GetInt32(r.GetOrdinal("CaseId")),
+                r.IsDBNull(r.GetOrdinal("CaseNumber"))? null: r.GetString(r.GetOrdinal("CaseNumber")),
+                r.GetInt32(r.GetOrdinal("StatusId")),
+                r.GetInt32(r.GetOrdinal("PriorityId")),
+                r.GetString(r.GetOrdinal("Title")),
+                r.GetString(r.GetOrdinal("Description")),
+                r.GetInt32(r.GetOrdinal("ContactId")),
+                r.GetInt32(r.GetOrdinal("ProgramId")),
+                r.GetString(r.GetOrdinal("Country")),
+                r.IsDBNull(r.GetOrdinal("OwnerId"))? (int?)null: r.GetInt32(r.GetOrdinal("OwnerId")),
+                r.GetInt32(r.GetOrdinal("CreatedByUserId")),
+                r.IsDBNull(r.GetOrdinal("PreferredContact"))? null: r.GetString(r.GetOrdinal("PreferredContact")),
+                r.GetDateTime(r.GetOrdinal("CreatedAt")),
+                r.GetDateTime(r.GetOrdinal("UpdatedAt")),
+                r.IsDBNull(r.GetOrdinal("ClosedAt"))? (DateTime?)null: r.GetDateTime(r.GetOrdinal("ClosedAt"))
+            );
+
+            model.Application = r.IsDBNull(r.GetOrdinal("Application"))? null: r.GetString(r.GetOrdinal("Application"));
+
+            return model;
+        }
+    }
 }

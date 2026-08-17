@@ -14,7 +14,7 @@ namespace ITSupport.DAL
 			var list = new List<SupportEngineer>();
 			using (var conn = DatabaseHelper.GetConnection())
 			using (var cmd = new SqlCommand(
-				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, JobTitle, IsActive FROM SupportEngineers", conn))
+                "SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, IsActive FROM SupportEngineers", conn))
 			{
 				conn.Open();
 				using (var reader = cmd.ExecuteReader())
@@ -28,7 +28,7 @@ namespace ITSupport.DAL
 		{
 			using (var conn = DatabaseHelper.GetConnection())
 			using (var cmd = new SqlCommand(
-				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, JobTitle, IsActive FROM SupportEngineers WHERE EngineerId = @EngineerId", conn))
+                "SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, IsActive FROM SupportEngineers WHERE EngineerId = @EngineerId", conn))
 			{
 				cmd.Parameters.AddWithValue("@EngineerId", engineerId);
 				conn.Open();
@@ -41,7 +41,7 @@ namespace ITSupport.DAL
 		{
 			using (var conn = DatabaseHelper.GetConnection())
 			using (var cmd = new SqlCommand(
-				"SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, JobTitle, IsActive FROM SupportEngineers WHERE Email = @Email", conn))
+                "SELECT EngineerId, Name, Email, PhoneNumber, LevelId, ScheduleId, IsActive FROM SupportEngineers WHERE Email = @Email", conn))
 			{
 				cmd.Parameters.AddWithValue("@Email", email);
 				conn.Open();
@@ -107,49 +107,58 @@ namespace ITSupport.DAL
 			}
 		}
 
-		public List<EngineerViewModel> GetAllWithLevel()
-		{
-			var list = new List<EngineerViewModel>();
-			const string sql = @"
-                SELECT se.EngineerId, se.Name, se.Email, se.PhoneNumber, se.JobTitle, se.IsActive,
-                       el.LevelName
-                FROM   SupportEngineers se
-                JOIN   EngineerLevels   el ON el.LevelId = se.LevelId
-                ORDER BY se.Name";
+        public List<EngineerViewModel> GetAllWithLevel()
+        {
+            var list = new List<EngineerViewModel>();
 
-			using (var conn = DatabaseHelper.GetConnection())
-			using (var cmd = new SqlCommand(sql, conn))
-			{
-				conn.Open();
-				using (var reader = cmd.ExecuteReader())
-				{
-					while (reader.Read())
-					{
-						list.Add(new EngineerViewModel
-						{
-							EngineerId = (int)reader["EngineerId"],
-							Name = (string)reader["Name"],
-							Email = (string)reader["Email"],
-							PhoneNumber = reader["PhoneNumber"] as string,
-							JobTitle = (string)reader["JobTitle"],
-							LevelName = (string)reader["LevelName"],
-							IsActive = (bool)reader["IsActive"]
-						});
-					}
-				}
-			}
-			return list;
-		}
+            const string sql = @"
+				SELECT se.EngineerId,
+					   se.Name,
+					   se.Email,
+					   se.PhoneNumber,
+					   se.IsActive,
+					   el.LevelName
+				FROM SupportEngineers se
+				JOIN EngineerLevels el ON el.LevelId = se.LevelId
+				ORDER BY se.Name";
 
-		private SupportEngineer Map(SqlDataReader r) => new SupportEngineer(
+            using (var conn = DatabaseHelper.GetConnection())
+            using (var cmd = new SqlCommand(sql, conn))
+            {
+                conn.Open();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new EngineerViewModel
+                        {
+                            EngineerId = (int)reader["EngineerId"],
+                            Name = (string)reader["Name"],
+                            Email = (string)reader["Email"],
+                            PhoneNumber = reader["PhoneNumber"] as string,
+
+                            // La BD actual no tiene JobTitle
+                            JobTitle = null,
+
+                            LevelName = (string)reader["LevelName"],
+                            IsActive = (bool)reader["IsActive"]
+                        });
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        private SupportEngineer Map(SqlDataReader r) => new SupportEngineer(
 			r.GetInt32(r.GetOrdinal("EngineerId")),
 			r.GetString(r.GetOrdinal("Name")),
 			r.GetString(r.GetOrdinal("Email")),
-			r.IsDBNull(r.GetOrdinal("PhoneNumber")) ? null : r.GetString(r.GetOrdinal("PhoneNumber")),
+			r.IsDBNull(r.GetOrdinal("PhoneNumber"))? null: r.GetString(r.GetOrdinal("PhoneNumber")),
 			r.GetInt32(r.GetOrdinal("LevelId")),
-			r.GetInt32(r.GetOrdinal("ScheduleId")),
-			r.GetString(r.GetOrdinal("JobTitle")),
+			r.GetInt32(r.GetOrdinal("ScheduleId")),null,
 			r.GetBoolean(r.GetOrdinal("IsActive"))
 		);
-	}
+    }
 }

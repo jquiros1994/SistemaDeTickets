@@ -440,7 +440,10 @@
                             <label>Description *</label>
                             <textarea name="Description" class="form-control" required>@Model.Description</textarea>
                         </div>
-
+                        <div class="form-group full">
+                            <label>Application *</label>
+                            <input type="text" name="Application" class="form-control" value="@Model.Application" placeholder="Application that generated the ticket" required />
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Status *</label>

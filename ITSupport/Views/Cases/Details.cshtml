@@ -156,6 +156,10 @@
                             <label>Status</label>
                             <span><span class="badge-status @statusClass">@Model.StatusName</span></span>
                         </div>
+                        <div class="detail-item">
+                            <span class="label">Application</span>
+                            <span>@Model.Application</span>
+                        </div>
                         <div class="meta-item">
                             <label>Priority</label>
                             <span><span class="badge-priority @Model.PriorityName">@Model.PriorityName</span></span>
@@ -180,9 +184,9 @@
                             <label>Owner</label>
                             <span>
                                 @if (string.IsNullOrEmpty(Model.OwnerName))
-                                { <span class="unassigned">Unassigned</span> }
+                                {<span class="unassigned">Unassigned</span> }
                                 else
-                                { @Model.OwnerName }
+                                { @Model.OwnerName}
                             </span>
                         </div>
                         <div class="meta-item">
