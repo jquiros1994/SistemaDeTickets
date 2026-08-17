@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace ITSupport.TicketReceiver.DTOs
+﻿namespace ITSupport.TicketReceiver.DTOs
 {
     public class CreateTicketResponse
     {
@@ -12,5 +7,7 @@ namespace ITSupport.TicketReceiver.DTOs
         public string Message { get; set; }
 
         public int TicketId { get; set; }
+
+        public string Severity { get; set; }
     }
 }

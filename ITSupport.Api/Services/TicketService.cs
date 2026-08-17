@@ -13,9 +13,11 @@ namespace ITSupport.TicketReceiver.Services
 
         public TicketService()
         {
-            // Registramos los observers
+            // Register observers
             Attach(new EmailObserver());
+            Attach(new TeamsObserver());
         }
+
         /// <summary>
         /// Registers a new observer that will receive notifications
         /// after a ticket is created.
@@ -24,6 +26,7 @@ namespace ITSupport.TicketReceiver.Services
         {
             _observers.Add(observer);
         }
+
         /// <summary>
         /// Removes an observer from the notification list.
         /// </summary>
@@ -31,6 +34,7 @@ namespace ITSupport.TicketReceiver.Services
         {
             _observers.Remove(observer);
         }
+
         /// <summary>
         /// Notifies all registered observers that a ticket
         /// has been created successfully.
@@ -42,6 +46,7 @@ namespace ITSupport.TicketReceiver.Services
                 observer.Update(response);
             }
         }
+
         /// <summary>
         /// Creates a new support ticket using the business layer.
         /// If the operation succeeds, all registered observers
@@ -65,10 +70,11 @@ namespace ITSupport.TicketReceiver.Services
             {
                 Success = result.Success,
                 Message = result.Message,
-                TicketId = result.CaseId
+                TicketId = result.CaseId,
+                Severity = request.Severity
             };
 
-            // Solo notificamos si el ticket se creó correctamente
+            // Notify observers only if the ticket was created successfully
             if (response.Success)
             {
                 Notify(response);
