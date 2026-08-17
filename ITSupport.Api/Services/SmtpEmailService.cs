@@ -5,52 +5,93 @@ using System.Net.Mail;
 
 namespace ITSupport.TicketReceiver.Services
 {
-    // SOLID: SRP
-    // This class is responsible only for sending emails through SMTP.
+    // Responsible for sending email notifications through SMTP.
     public class SmtpEmailService : IEmailService
     {
         public void SendTicketCreatedEmail(int ticketId)
+        {
+            string recipient = ConfigurationManager.AppSettings["EmailTo"];
+
+            SendEmail(
+                "New Ticket Created",
+                $"A new support ticket has been created successfully.\n\n" +
+                $"Ticket ID: {ticketId}\n\n" +
+                $"This email was generated automatically by ITSupport TicketReceiver.",
+                recipient
+            );
+        }
+
+        public void SendCriticalTicketEmail(int ticketId)
+        {
+            string recipients = ConfigurationManager.AppSettings["CriticalEmailTo"];
+
+            SendEmail(
+                $"CRITICAL TICKET - #{ticketId}",
+                $"A CRITICAL support ticket has been created.\n\n" +
+                $"Ticket ID: {ticketId}\n" +
+                $"Severity: Critical\n\n" +
+                $"This notification requires immediate attention.",
+                recipients
+            );
+        }
+
+        private void SendEmail(string subject, string body, string recipients)
         {
             string smtpHost = ConfigurationManager.AppSettings["SmtpHost"];
             int smtpPort = int.Parse(ConfigurationManager.AppSettings["SmtpPort"]);
             string smtpUser = ConfigurationManager.AppSettings["SmtpUser"];
 
-            // The password is read from a Windows environment variable
-            // so it is not stored in the source code or Web.config.
-            string smtpPassword = Environment.GetEnvironmentVariable("ITSupport_SmtpPassword");
+            string smtpPassword =
+                Environment.GetEnvironmentVariable("ITSupport_SmtpPassword");
 
             string emailFrom = ConfigurationManager.AppSettings["EmailFrom"];
-            string emailTo = ConfigurationManager.AppSettings["EmailTo"];
 
             if (string.IsNullOrWhiteSpace(smtpPassword))
             {
                 throw new InvalidOperationException(
-                    "The environment variable 'ITSupport_SmtpPassword' was not found.");
+                    "The environment variable 'ITSupport_SmtpPassword' was not found."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(recipients))
+            {
+                throw new InvalidOperationException(
+                    "No email recipients were configured."
+                );
             }
 
             using (SmtpClient smtpClient = new SmtpClient(smtpHost, smtpPort))
             {
                 smtpClient.EnableSsl = true;
                 smtpClient.UseDefaultCredentials = false;
+
                 smtpClient.Credentials = new NetworkCredential(
                     smtpUser,
                     smtpPassword
                 );
 
-                MailMessage message = new MailMessage
+                using (MailMessage message = new MailMessage())
                 {
-                    From = new MailAddress(emailFrom),
-                    Subject = $"New Ticket Created - #{ticketId}",
-                    Body =
-                        $"A new support ticket has been created successfully.\n\n" +
-                        $"Ticket ID: {ticketId}\n\n" +
-                        $"This email was generated automatically by ITSupport TicketReceiver.",
-                    IsBodyHtml = false
-                };
+                    message.From = new MailAddress(emailFrom);
+                    message.Subject = subject;
+                    message.Body = body;
+                    message.IsBodyHtml = false;
 
-                message.To.Add(emailTo);
+                    // Allows multiple recipients separated by ';'
+                    string[] emailList = recipients.Split(';');
 
-                smtpClient.Send(message);
+                    foreach (string email in emailList)
+                    {
+                        string trimmedEmail = email.Trim();
+
+                        if (!string.IsNullOrWhiteSpace(trimmedEmail))
+                        {
+                            message.To.Add(trimmedEmail);
+                        }
+                    }
+
+                    smtpClient.Send(message);
+                }
             }
         }
     }

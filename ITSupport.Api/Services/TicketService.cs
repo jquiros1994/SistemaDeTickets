@@ -15,7 +15,7 @@ namespace ITSupport.TicketReceiver.Services
         {
             // Register observers
             Attach(new EmailObserver());
-            Attach(new TeamsObserver());
+            Attach(new CriticalEmailObserver());
         }
 
         /// <summary>
